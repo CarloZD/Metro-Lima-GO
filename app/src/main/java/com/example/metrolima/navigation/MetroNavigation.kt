@@ -112,9 +112,11 @@ fun MetroNavigation() {
 
         // Configuración
         composable(Screen.Settings.route) {
-            PlaceholderScreen(
-                title = "Configuración",
-                onBack = { navController.popBackStack() }
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) }
             )
         }
 
