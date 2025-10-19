@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun StationDetailScreen(
     station: Station,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToRoute: (String, String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -39,7 +40,9 @@ fun StationDetailScreen(
         },
         bottomBar = {
             Button(
-                onClick = { /* TODO: favoritos */ },
+                onClick = {
+                    onNavigateToRoute(station.name, "")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),

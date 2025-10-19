@@ -1,18 +1,9 @@
 package com.example.metrolima.presentation.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +22,10 @@ sealed class Screen(val route: String) {
     object Stations : Screen("stations")
     object Routes : Screen("routes")
     object Settings : Screen("settings")
+    object Favorites : Screen("favorites")
+    object RouteDetail : Screen("route_detail/{origin}/{destination}") {
+        fun createRoute(origin: String, destination: String) = "route_detail/$origin/$destination"
+    }
     object StationDetail : Screen("station_detail/{stationId}") {
         fun createRoute(stationId: String) = "station_detail/$stationId"
     }
@@ -47,18 +42,14 @@ fun MetroNavigation() {
         navController = navController,
         startDestination = Screen.Home.route
     ) {
-        // Pantalla principal
+        // Home
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigateToStations = {
-                    navController.navigate(Screen.Stations.route)
-                },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = {
-                    navController.navigate(Screen.Routes.route)
+                    navController.navigate(Screen.RouteDetail.createRoute("La Cultura", "Bayóvar"))
                 },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
-                }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
             )
         }
 
@@ -91,22 +82,46 @@ fun MetroNavigation() {
             )
             StationDetailScreen(
                 station = selectedStation,
+                onBack = { navController.popBackStack() },
+                onNavigateToRoute = { origin, destination ->
+                    navController.navigate(Screen.RouteDetail.createRoute(origin, destination))
+                }
+            )
+        }
+
+        // Favoritos
+        composable(Screen.Favorites.route) {
+            FavoritesScreen(
                 onBack = { navController.popBackStack() }
             )
         }
 
-        // Pantalla de rutas
-        composable(Screen.Routes.route) {
-            PlaceholderScreen(
-                title = "Rutas",
-                onBack = { navController.popBackStack() }
+        // Detalle de ruta
+        composable(Screen.RouteDetail.route) { backStackEntry ->
+            val origin = backStackEntry.arguments?.getString("origin") ?: "Desconocido"
+            val destination = backStackEntry.arguments?.getString("destination") ?: "Desconocido"
+            RouteDetailScreen(
+                origin = origin,
+                destination = destination,
+                onBack = { navController.popBackStack() },
+                onSaveRoute = {
+                    navController.navigate(Screen.Favorites.route)
+                }
             )
         }
 
-        // Pantalla de configuración
+        // Configuración
         composable(Screen.Settings.route) {
             PlaceholderScreen(
                 title = "Configuración",
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Rutas
+        composable(Screen.Routes.route) {
+            PlaceholderScreen(
+                title = "Rutas",
                 onBack = { navController.popBackStack() }
             )
         }
@@ -145,10 +160,7 @@ fun PlaceholderScreen(title: String, onBack: () -> Unit) {
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                "Pantalla de $title - En desarrollo",
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Text("$title - En desarrollo")
         }
     }
 }
