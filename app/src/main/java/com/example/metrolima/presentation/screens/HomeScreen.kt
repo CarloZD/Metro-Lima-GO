@@ -71,7 +71,7 @@ fun HomeScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Aquí puedes poner tu logo
+                        //  El logo irá aqui
                         Box(
                             modifier = Modifier
                                 .size(120.dp)
