@@ -8,8 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,32 +20,42 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.metrolima.R
-
-data class Station(
-    val id: String,
-    val name: String,
-    val line: String,
-    val district: String,
-    val imageRes: Int
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metrolima.presentation.viewmodel.EstacionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StationsScreen(
-    stations: List<Station>,
-    onBack: () -> Unit,
-    onStationClick: (Station) -> Unit
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToRoutes: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
+    onStationClick: (Int) -> Unit = {},
+    onBack: () -> Unit = {},
+    viewModel: EstacionViewModel = viewModel()
 ) {
-    var searchQuery by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableStateOf(1) }
+
+    // Observar datos desde Room
+    val estaciones by viewModel.estaciones.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Estaciones", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Estaciones",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -54,6 +63,46 @@ fun StationsScreen(
                     titleContentColor = Color.White
                 )
             )
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color.White,
+                contentColor = Color(0xFF2196F3)
+            ) {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                    label = { Text("Home", fontSize = 10.sp) },
+                    selected = selectedTab == 0,
+                    onClick = {
+                        selectedTab = 0
+                        onNavigateToHome()
+                    }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Train, contentDescription = null) },
+                    label = { Text("Estaciones", fontSize = 10.sp) },
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
+                    label = { Text("Rutas", fontSize = 10.sp) },
+                    selected = selectedTab == 2,
+                    onClick = {
+                        selectedTab = 2
+                        onNavigateToRoutes()
+                    }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                    label = { Text("Configuración", fontSize = 10.sp) },
+                    selected = selectedTab == 3,
+                    onClick = {
+                        selectedTab = 3
+                        onNavigateToSettings()
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -62,28 +111,89 @@ fun StationsScreen(
                 .background(Color(0xFFF5F5F5))
                 .padding(paddingValues)
         ) {
-            // Search
+            // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { viewModel.searchEstaciones(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar") },
+                placeholder = { Text("Buscar", color = Color.Gray) },
                 leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.Gray
+                    )
                 },
-                shape = RoundedCornerShape(12.dp)
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.searchEstaciones("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Limpiar",
+                                tint = Color.Gray
+                            )
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF2196F3),
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                ),
+                singleLine = true
             )
 
-            // Stations list
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 80.dp)
-            ) {
-                items(stations.filter {
-                    it.name.contains(searchQuery, ignoreCase = true)
-                }) { station ->
-                    StationItem(station = station, onClick = { onStationClick(station) })
+            // Mostrar loading o lista
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF2196F3)
+                    )
+                }
+            } else if (estaciones.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SearchOff,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "No se encontraron estaciones",
+                            fontSize = 16.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            } else {
+                // Lista de estaciones desde Room
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(estaciones) { estacion ->
+                        StationItem(
+                            id = estacion.id,
+                            name = estacion.nombre,
+                            line = estacion.linea,
+                            district = estacion.distrito,
+                            imageRes = estacion.imagenRes,
+                            onClick = { onStationClick(estacion.id) }
+                        )
+                    }
                 }
             }
         }
@@ -91,7 +201,14 @@ fun StationsScreen(
 }
 
 @Composable
-fun StationItem(station: Station, onClick: () -> Unit) {
+fun StationItem(
+    id: Int,
+    name: String,
+    line: String,
+    district: String,
+    imageRes: Int,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,21 +221,51 @@ fun StationItem(station: Station, onClick: () -> Unit) {
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(station.imageRes),
-                contentDescription = station.name,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+            if (imageRes != 0) {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = name,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFE3F2FD)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Train,
+                        contentDescription = null,
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.width(12.dp))
+
             Column {
-                Text(station.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text(station.line, color = Color(0xFF2196F3), fontSize = 13.sp)
-                Text(station.district, color = Color.Gray, fontSize = 13.sp)
+                Text(
+                    name,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+                Text(
+                    line,
+                    color = Color(0xFF2196F3),
+                    fontSize = 13.sp
+                )
+                Text(
+                    district,
+                    color = Color.Gray,
+                    fontSize = 13.sp
+                )
             }
         }
     }
 }
-

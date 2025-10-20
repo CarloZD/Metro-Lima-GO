@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.metrolima.R
 import com.example.metrolima.presentation.screens.*
 
 /* ---------------------------
@@ -46,42 +45,33 @@ fun MetroNavigation() {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
-                onNavigateToRoutes = {
-                    navController.navigate(Screen.RouteDetail.createRoute("La Cultura", "Bayóvar"))
-                },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
             )
         }
 
-        // Lista de estaciones
+        // Lista de estaciones - USA ROOM
         composable(Screen.Stations.route) {
             StationsScreen(
-                stations = listOf(
-                    Station("1", "Estación La Cultura", "1", "San Borja", R.drawable.estacion1),
-                    Station("2", "Estación Bayóvar", "1", "San Juan de Lurigancho", R.drawable.estacion2),
-                    Station("3", "Estación Villa El Salvador", "1", "Villa El Salvador", R.drawable.estacion3),
-                    Station("4", "Estación Los Jardines", "1", "San Juan de Lurigancho", R.drawable.estacion4),
-                    Station("5", "Estación San Carlos", "1", "San Juan de Lurigancho", R.drawable.estacion5)
-                ),
-                onBack = { navController.popBackStack() },
-                onStationClick = { station ->
-                    navController.navigate(Screen.StationDetail.createRoute(station.id))
-                }
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onStationClick = { stationId ->
+                    navController.navigate(Screen.StationDetail.createRoute(stationId.toString()))
+                },
+                onBack = { navController.popBackStack() }
             )
         }
 
-        // Detalle de estación
+        // Detalle de estación - USA ROOM
         composable(Screen.StationDetail.route) { backStackEntry ->
-            val stationId = backStackEntry.arguments?.getString("stationId") ?: ""
-            val selectedStation = Station(
-                id = stationId,
-                name = "Estación Central",
-                line = "1",
-                district = "Cercado de Lima",
-                imageRes = R.drawable.estacion1
-            )
+            val stationId = backStackEntry.arguments?.getString("stationId")?.toIntOrNull() ?: 1
             StationDetailScreen(
-                station = selectedStation,
+                stationId = stationId,
                 onBack = { navController.popBackStack() },
                 onNavigateToRoute = { origin, destination ->
                     navController.navigate(Screen.RouteDetail.createRoute(origin, destination))
@@ -114,16 +104,20 @@ fun MetroNavigation() {
         composable(Screen.Settings.route) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) }
             )
         }
 
-        // Rutas
+        // Rutas - Placeholder temporal
         composable(Screen.Routes.route) {
             PlaceholderScreen(
-                title = "Rutas",
+                title = "Planificar Ruta",
                 onBack = { navController.popBackStack() }
             )
         }
