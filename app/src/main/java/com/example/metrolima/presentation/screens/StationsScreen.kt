@@ -34,6 +34,8 @@ fun StationsScreen(
     viewModel: EstacionViewModel = viewModel()
 ) {
     var selectedTab by remember { mutableStateOf(1) }
+    var selectedLine by remember { mutableStateOf("Todas") }
+    var showFilterMenu by remember { mutableStateOf(false) }
 
     // Observar datos desde Room
     val estaciones by viewModel.estaciones.collectAsState()
@@ -55,6 +57,47 @@ fun StationsScreen(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
                             tint = Color.White
+                        )
+                    }
+                },
+                actions = {
+                    // Botón de filtro por línea
+                    IconButton(onClick = { showFilterMenu = true }) {
+                        Icon(
+                            Icons.Default.FilterList,
+                            contentDescription = "Filtrar",
+                            tint = Color.White
+                        )
+                    }
+
+                    // Menú desplegable
+                    DropdownMenu(
+                        expanded = showFilterMenu,
+                        onDismissRequest = { showFilterMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Todas las líneas") },
+                            onClick = {
+                                selectedLine = "Todas"
+                                viewModel.searchEstaciones("")
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Línea 1") },
+                            onClick = {
+                                selectedLine = "Línea 1"
+                                viewModel.getEstacionesByLinea("Línea 1")
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Línea 2") },
+                            onClick = {
+                                selectedLine = "Línea 2"
+                                viewModel.getEstacionesByLinea("Línea 2")
+                                showFilterMenu = false
+                            }
                         )
                     }
                 },
@@ -111,6 +154,44 @@ fun StationsScreen(
                 .background(Color(0xFFF5F5F5))
                 .padding(paddingValues)
         ) {
+            // Chip de filtro actual
+            if (selectedLine != "Todas") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AssistChip(
+                        onClick = {
+                            selectedLine = "Todas"
+                            viewModel.searchEstaciones("")
+                        },
+                        label = {
+                            Text(
+                                "Filtrando: $selectedLine",
+                                fontSize = 12.sp
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.FilterList,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Quitar filtro",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
+
             // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
@@ -118,7 +199,7 @@ fun StationsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar", color = Color.Gray) },
+                placeholder = { Text("Buscar estación o distrito", color = Color.Gray) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -145,6 +226,14 @@ fun StationsScreen(
                     unfocusedContainerColor = Color.White
                 ),
                 singleLine = true
+            )
+
+            // Contador de resultados
+            Text(
+                "${estaciones.size} estaciones encontradas",
+                fontSize = 12.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
             // Mostrar loading o lista
@@ -177,6 +266,17 @@ fun StationsScreen(
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
+                        if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TextButton(
+                                onClick = {
+                                    selectedLine = "Todas"
+                                    viewModel.searchEstaciones("")
+                                }
+                            ) {
+                                Text("Limpiar filtros")
+                            }
+                        }
                     }
                 }
             } else {
@@ -255,16 +355,29 @@ fun StationItem(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                Text(
-                    line,
-                    color = Color(0xFF2196F3),
-                    fontSize = 13.sp
-                )
-                Text(
-                    district,
-                    color = Color.Gray,
-                    fontSize = 13.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Badge de línea
+                    Surface(
+                        color = Color(0xFF2196F3),
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            line,
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Text(
+                        district,
+                        color = Color.Gray,
+                        fontSize = 13.sp
+                    )
+                }
             }
         }
     }
