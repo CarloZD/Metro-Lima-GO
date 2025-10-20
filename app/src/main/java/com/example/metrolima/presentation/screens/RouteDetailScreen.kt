@@ -23,7 +23,11 @@ fun RouteDetailScreenWithButtons(
     origin: String,
     destination: String,
     onBack: () -> Unit,
-    onSaveRoute: () -> Unit
+    onSaveRoute: () -> Unit,
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToStations: () -> Unit = {},
+    onNavigateToRoutes: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ){
     Scaffold(
         topBar = {
@@ -40,6 +44,15 @@ fun RouteDetailScreenWithButtons(
                     containerColor = Color(0xFF2196F3),
                     titleContentColor = Color.White
                 )
+            )
+        },
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = 2,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToStations = onNavigateToStations,
+                onNavigateToRoutes = onNavigateToRoutes,
+                onNavigateToSettings = onNavigateToSettings
             )
         }
     ) { padding ->
@@ -84,30 +97,35 @@ fun RouteDetailScreenWithButtons(
                 }
             }
 
-            Button(
-                onClick = { onSaveRoute(); onBack() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(Icons.Default.Star, null, Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Guardar ruta", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+                Button(
+                    onClick = { onSaveRoute() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(32.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Icon(Icons.Default.Star, null, Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Guardar ruta", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                }
 
-            Button(
-                onClick = { onSaveRoute() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Star, null, Modifier.size(20.dp), Color.White)
-                Spacer(Modifier.width(8.dp))
-                Text("Agregar a favoritos", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Button(
+                    onClick = { onSaveRoute() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(32.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    Icon(Icons.Default.Favorite, null, Modifier.size(14.dp), Color.White)
+                    Spacer(Modifier.width(4.dp))
+                    Text("Favoritos", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                }
             }
         }
     }
@@ -126,5 +144,45 @@ private fun DetailRow(icon: ImageVector, title: String, subtitle: String) {
             Spacer(Modifier.height(4.dp))
             Text(subtitle, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
         }
+    }
+}
+
+@Composable
+private fun BottomNavigationBar(
+    selectedItem: Int,
+    onNavigateToHome: () -> Unit,
+    onNavigateToStations: () -> Unit,
+    onNavigateToRoutes: () -> Unit,
+    onNavigateToSettings: () -> Unit
+) {
+    NavigationBar(
+        containerColor = Color.White,
+        contentColor = Color(0xFF2196F3),
+        modifier = Modifier.height(60.dp)
+    ) {
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
+            label = { Text("Home", fontSize = 8.sp) },
+            selected = selectedItem == 0,
+            onClick = onNavigateToHome
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones", modifier = Modifier.size(20.dp)) },
+            label = { Text("Estaciones", fontSize = 8.sp) },
+            selected = selectedItem == 1,
+            onClick = onNavigateToStations
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas", modifier = Modifier.size(20.dp)) },
+            label = { Text("Rutas", fontSize = 8.sp) },
+            selected = selectedItem == 2,
+            onClick = onNavigateToRoutes
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración", modifier = Modifier.size(20.dp)) },
+            label = { Text("Configuración", fontSize = 8.sp) },
+            selected = selectedItem == 3,
+            onClick = onNavigateToSettings
+        )
     }
 }

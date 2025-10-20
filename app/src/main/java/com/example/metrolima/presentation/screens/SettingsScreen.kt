@@ -21,7 +21,8 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit
+    onNavigateToRoutes: () -> Unit,
+    onNavigateToAbout: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -166,7 +167,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .clickable { }
+                    .clickable { onNavigateToAbout() }
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically

@@ -29,7 +29,8 @@ import kotlinx.coroutines.launch
 fun StationDetailScreen(
     stationId: Int,
     onBack: () -> Unit,
-    onNavigateToRoute: (String, String) -> Unit
+    onNavigateToRoute: (String, String) -> Unit,
+    onNavigateToFavorites: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -122,10 +123,10 @@ fun StationDetailScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Botón para planificar ruta
+                        // Botón para agregar a favoritos
                         Button(
                             onClick = {
-                                onNavigateToRoute(currentEstacion.nombre, "")
+                                onNavigateToFavorites()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

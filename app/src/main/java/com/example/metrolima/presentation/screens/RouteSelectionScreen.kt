@@ -26,6 +26,28 @@ data class FavoriteRouteItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun RouteSelectionScreen(
+    onBack: () -> Unit,
+    onNavigateToFavorites: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToStations: () -> Unit = {},
+    onNavigateToRoutes: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
+) {
+    RouteDetailScreenWithButtons(
+        origin = "Estación Central",
+        destination = "Estación Villa El Salvador",
+        onBack = onBack,
+        onSaveRoute = onNavigateToFavorites,
+        onNavigateToHome = onNavigateToHome,
+        onNavigateToStations = onNavigateToStations,
+        onNavigateToRoutes = onNavigateToRoutes,
+        onNavigateToSettings = onNavigateToSettings
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun RouteDetailScreen(
     origin: String,
     destination: String,
@@ -353,29 +375,30 @@ private fun BottomNavigationBar(
 ) {
     NavigationBar(
         containerColor = Color.White,
-        contentColor = Color(0xFF2196F3)
+        contentColor = Color(0xFF2196F3),
+        modifier = Modifier.height(60.dp)
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
+            label = { Text("Home", fontSize = 8.sp) },
             selected = selectedItem == 0,
             onClick = onNavigateToHome
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones") },
-            label = { Text("Estaciones", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones", modifier = Modifier.size(20.dp)) },
+            label = { Text("Estaciones", fontSize = 8.sp) },
             selected = selectedItem == 1,
             onClick = onNavigateToStations
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas") },
-            label = { Text("Rutas", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas", modifier = Modifier.size(20.dp)) },
+            label = { Text("Rutas", fontSize = 8.sp) },
             selected = selectedItem == 2,
             onClick = onNavigateToRoutes
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración", modifier = Modifier.size(20.dp)) },
+            label = { Text("Configuración", fontSize = 8.sp) },
             selected = selectedItem == 3,
             onClick = onNavigateToSettings
         )

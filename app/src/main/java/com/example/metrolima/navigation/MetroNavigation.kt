@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     object Routes : Screen("routes")
     object Settings : Screen("settings")
     object Favorites : Screen("favorites")
+    object About : Screen("about")
     object RouteDetail : Screen("route_detail/{origin}/{destination}") {
         fun createRoute(origin: String, destination: String) = "route_detail/$origin/$destination"
     }
@@ -75,6 +76,9 @@ fun MetroNavigation() {
                 onBack = { navController.popBackStack() },
                 onNavigateToRoute = { origin, destination ->
                     navController.navigate(Screen.RouteDetail.createRoute(origin, destination))
+                },
+                onNavigateToFavorites = {
+                    navController.navigate(Screen.Favorites.route)
                 }
             )
         }
@@ -110,15 +114,41 @@ fun MetroNavigation() {
                     }
                 },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
-                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) }
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToAbout = { navController.navigate(Screen.About.route) }
             )
         }
 
-        // Rutas - Placeholder temporal
+        // Acerca de
+        composable(Screen.About.route) {
+            AboutScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+            )
+        }
+
+        // Rutas - Pantalla de selección de rutas
         composable(Screen.Routes.route) {
-            PlaceholderScreen(
-                title = "Planificar Ruta",
-                onBack = { navController.popBackStack() }
+            RouteSelectionScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToFavorites = {
+                    navController.navigate(Screen.Favorites.route)
+                },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { /* Ya estamos en rutas */ },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
             )
         }
     }
