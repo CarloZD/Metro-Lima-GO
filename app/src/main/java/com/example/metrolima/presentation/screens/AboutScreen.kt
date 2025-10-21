@@ -42,13 +42,13 @@ fun AboutScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -65,7 +65,7 @@ fun AboutScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
@@ -76,13 +76,15 @@ fun AboutScreen(
                 "Equipo de Desarrollo",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(
@@ -98,20 +100,20 @@ fun AboutScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFFE3F2FD)),
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color(0xFF2196F3),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                         Text(
                             "Desarrollador",
                             fontSize = 14.sp,
-                            color = Color(0xFF2196F3)
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -124,20 +126,20 @@ fun AboutScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFFE3F2FD)),
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color(0xFF2196F3),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                         Text(
                             "Desarrolladora",
                             fontSize = 14.sp,
-                            color = Color(0xFF2196F3)
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -150,20 +152,20 @@ fun AboutScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFFE3F2FD)),
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = Color(0xFF2196F3),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                         Text(
                             "Desarrollador",
                             fontSize = 14.sp,
-                            color = Color(0xFF2196F3)
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -174,13 +176,15 @@ fun AboutScreen(
                 "Información de la Aplicación",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(
@@ -198,19 +202,21 @@ fun AboutScreen(
                 "Agradecimientos",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Text(
                     "Agradecemos a todos los usuarios por su apoyo y retroalimentación, que nos ayudan a mejorar continuamente la aplicación. También agradecemos a las autoridades del Metro de Lima por su colaboración.",
                     fontSize = 14.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(16.dp)
                 )
             }
@@ -228,12 +234,12 @@ private fun InfoRow(label: String, value: String) {
         Text(
             label,
             fontSize = 14.sp,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             value,
             fontSize = 14.sp,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }
@@ -247,30 +253,54 @@ private fun BottomNavigationBar(
     onNavigateToSettings: () -> Unit
 ) {
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color(0xFF2196F3),
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
         modifier = Modifier.height(60.dp)
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Home", fontSize = 8.sp) },
             selected = selectedItem == 0,
             onClick = onNavigateToHome
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Train,
+                    contentDescription = "Estaciones",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Estaciones", fontSize = 8.sp) },
             selected = selectedItem == 1,
             onClick = onNavigateToStations
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Map,
+                    contentDescription = "Rutas",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Rutas", fontSize = 8.sp) },
             selected = selectedItem == 2,
             onClick = onNavigateToRoutes
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = "Configuración",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Configuración", fontSize = 8.sp) },
             selected = selectedItem == 3,
             onClick = onNavigateToSettings

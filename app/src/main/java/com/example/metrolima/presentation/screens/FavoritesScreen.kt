@@ -72,12 +72,16 @@ fun FavoritesScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            "Volver",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -94,14 +98,14 @@ fun FavoritesScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
             // Tab Row
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = Color.White,
-                contentColor = Color(0xFF2196F3)
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
                 Tab(
                     selected = selectedTab == 0,
@@ -120,8 +124,7 @@ fun FavoritesScreen(
                 0 -> {
                     if (favoriteRoutes.isEmpty()) {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Column(
@@ -132,18 +135,18 @@ fun FavoritesScreen(
                                     Icons.Default.Star,
                                     contentDescription = null,
                                     modifier = Modifier.size(80.dp),
-                                    tint = Color.LightGray
+                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                                 )
                                 Text(
                                     "No tienes rutas favoritas",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                                 )
                                 Text(
                                     "Guarda tus rutas frecuentes aquí",
                                     fontSize = 14.sp,
-                                    color = Color.LightGray
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                                 )
                             }
                         }
@@ -167,8 +170,7 @@ fun FavoritesScreen(
                 1 -> {
                     if (favoriteStations.isEmpty()) {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Column(
@@ -179,18 +181,18 @@ fun FavoritesScreen(
                                     Icons.Default.Train,
                                     contentDescription = null,
                                     modifier = Modifier.size(80.dp),
-                                    tint = Color.LightGray
+                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                                 )
                                 Text(
                                     "No tienes estaciones favoritas",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                                 )
                                 Text(
                                     "Guarda tus estaciones frecuentes aquí",
                                     fontSize = 14.sp,
-                                    color = Color.LightGray
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                                 )
                             }
                         }
@@ -225,7 +227,7 @@ private fun FavoriteRouteItem(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -263,13 +265,13 @@ private fun FavoriteRouteItem(
                         route.name,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         route.line,
                         fontSize = 14.sp,
-                        color = Color(0xFF2196F3)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -278,7 +280,7 @@ private fun FavoriteRouteItem(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Eliminar",
-                    tint = Color.Gray
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
@@ -294,7 +296,7 @@ private fun FavoriteStationItem(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -314,7 +316,7 @@ private fun FavoriteStationItem(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            color = Color(0xFFE3F2FD),
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = RoundedCornerShape(12.dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -322,7 +324,7 @@ private fun FavoriteStationItem(
                     Icon(
                         Icons.Default.Train,
                         contentDescription = null,
-                        tint = Color(0xFF2196F3),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -332,19 +334,19 @@ private fun FavoriteStationItem(
                         station.name,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         station.line,
                         fontSize = 14.sp,
-                        color = Color(0xFF2196F3)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         station.district,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
             }
@@ -353,7 +355,7 @@ private fun FavoriteStationItem(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Eliminar",
-                    tint = Color.Gray
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
@@ -369,8 +371,8 @@ private fun BottomNavigationBar(
     onNavigateToSettings: () -> Unit
 ) {
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color(0xFF2196F3)
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },

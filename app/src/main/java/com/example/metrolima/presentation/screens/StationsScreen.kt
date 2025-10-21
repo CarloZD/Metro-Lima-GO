@@ -34,6 +34,8 @@ fun StationsScreen(
     viewModel: EstacionViewModel = viewModel()
 ) {
     var selectedTab by remember { mutableStateOf(1) }
+    var selectedLine by remember { mutableStateOf("Todas") }
+    var showFilterMenu by remember { mutableStateOf(false) }
 
     // Observar datos desde Room
     val estaciones by viewModel.estaciones.collectAsState()
@@ -54,20 +56,61 @@ fun StationsScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+                actions = {
+                    // Botón de filtro por línea
+                    IconButton(onClick = { showFilterMenu = true }) {
+                        Icon(
+                            Icons.Default.FilterList,
+                            contentDescription = "Filtrar",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    // Menú desplegable
+                    DropdownMenu(
+                        expanded = showFilterMenu,
+                        onDismissRequest = { showFilterMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Todas las líneas") },
+                            onClick = {
+                                selectedLine = "Todas"
+                                viewModel.searchEstaciones("")
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Línea 1") },
+                            onClick = {
+                                selectedLine = "Línea 1"
+                                viewModel.getEstacionesByLinea("Línea 1")
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Línea 2") },
+                            onClick = {
+                                selectedLine = "Línea 2"
+                                viewModel.getEstacionesByLinea("Línea 2")
+                                showFilterMenu = false
+                            }
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color.White,
-                contentColor = Color(0xFF2196F3)
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
@@ -108,9 +151,47 @@ fun StationsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
+            // Chip de filtro actual
+            if (selectedLine != "Todas") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AssistChip(
+                        onClick = {
+                            selectedLine = "Todas"
+                            viewModel.searchEstaciones("")
+                        },
+                        label = {
+                            Text(
+                                "Filtrando: $selectedLine",
+                                fontSize = 12.sp
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.FilterList,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Quitar filtro",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
+
             // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
@@ -118,12 +199,17 @@ fun StationsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar", color = Color.Gray) },
+                placeholder = {
+                    Text(
+                        "Buscar estación o distrito",
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 },
                 trailingIcon = {
@@ -132,19 +218,27 @@ fun StationsScreen(
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Limpiar",
-                                tint = Color.Gray
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         }
                     }
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF2196F3),
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 singleLine = true
+            )
+
+            // Contador de resultados
+            Text(
+                "${estaciones.size} estaciones encontradas",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
             // Mostrar loading o lista
@@ -154,7 +248,7 @@ fun StationsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        color = Color(0xFF2196F3)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             } else if (estaciones.isEmpty()) {
@@ -169,14 +263,25 @@ fun StationsScreen(
                             imageVector = Icons.Default.SearchOff,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "No se encontraron estaciones",
                             fontSize = 16.sp,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                         )
+                        if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TextButton(
+                                onClick = {
+                                    selectedLine = "Todas"
+                                    viewModel.searchEstaciones("")
+                                }
+                            ) {
+                                Text("Limpiar filtros")
+                            }
+                        }
                     }
                 }
             } else {
@@ -214,7 +319,9 @@ fun StationItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -235,13 +342,13 @@ fun StationItem(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFE3F2FD)),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Train,
                         contentDescription = null,
-                        tint = Color(0xFF2196F3),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -253,18 +360,32 @@ fun StationItem(
                 Text(
                     name,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    line,
-                    color = Color(0xFF2196F3),
-                    fontSize = 13.sp
-                )
-                Text(
-                    district,
-                    color = Color.Gray,
-                    fontSize = 13.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Badge de línea
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            line,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Text(
+                        district,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        fontSize = 13.sp
+                    )
+                }
             }
         }
     }

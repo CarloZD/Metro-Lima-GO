@@ -50,19 +50,24 @@ fun StationDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Estación", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Estación",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -74,7 +79,7 @@ fun StationDetailScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF2196F3))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             val currentEstacion = estacion
@@ -104,14 +109,21 @@ fun StationDetailScreen(
                         Text(
                             currentEstacion.nombre,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Detalles
-                        DetailRow(Icons.Default.Train, currentEstacion.linea)
-                        DetailRow(Icons.Default.LocationOn, currentEstacion.distrito)
+                        DetailRow(
+                            Icons.Default.Train,
+                            currentEstacion.linea
+                        )
+                        DetailRow(
+                            Icons.Default.LocationOn,
+                            currentEstacion.distrito
+                        )
                         DetailRow(
                             Icons.Default.Public,
                             "Lat: ${currentEstacion.latitud}, Lon: ${currentEstacion.longitud}"
@@ -132,11 +144,14 @@ fun StationDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2196F3)
+                                containerColor = MaterialTheme.colorScheme.primary
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Agregar a favoritos", color = Color.White)
+                            Text(
+                                "Agregar a favoritos",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }
@@ -154,13 +169,13 @@ fun StationDetailScreen(
                             imageVector = Icons.Default.ErrorOutline,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "Estación no encontrada",
                             fontSize = 18.sp,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         TextButton(onClick = onBack) {
@@ -179,8 +194,16 @@ fun DetailRow(icon: ImageVector, text: String) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 6.dp)
     ) {
-        Icon(icon, contentDescription = null, tint = Color(0xFF2196F3))
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text, fontSize = 14.sp)
+        Text(
+            text,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }

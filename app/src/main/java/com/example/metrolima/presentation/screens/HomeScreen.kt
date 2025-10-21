@@ -39,8 +39,8 @@ fun HomeScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -56,7 +56,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF5F5F5)),
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Logo Section
@@ -64,14 +64,13 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        //  El logo irá aqui
                         Box(
                             modifier = Modifier
                                 .size(120.dp)
@@ -110,7 +109,7 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
@@ -138,7 +137,7 @@ fun HomeScreen(
                     "ACCESO RÁPIDO",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -175,7 +174,7 @@ fun HomeScreen(
                     "ESTACIONES",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 16.dp)
@@ -205,18 +204,23 @@ fun SearchField(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        placeholder = { Text(hint, color = Color.Gray) },
+        placeholder = {
+            Text(
+                hint,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         },
         enabled = false,
         colors = OutlinedTextFieldDefaults.colors(
-            disabledContainerColor = Color.White,
-            disabledBorderColor = Color.LightGray
+            disabledContainerColor = MaterialTheme.colorScheme.surface,
+            disabledBorderColor = MaterialTheme.colorScheme.outline
         )
     )
 }
@@ -235,7 +239,7 @@ fun QuickAccessCard(
             .height(100.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -257,13 +261,13 @@ fun QuickAccessCard(
                 title,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             subtitle?.let {
                 Text(
                     it,
                     fontSize = 10.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
@@ -281,7 +285,7 @@ fun StationListItem(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
@@ -294,20 +298,20 @@ fun StationListItem(
             Icon(
                 imageVector = Icons.Default.Train,
                 contentDescription = null,
-                tint = Color(0xFF2196F3),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 stationName,
                 fontSize = 14.sp,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
     }
@@ -322,8 +326,8 @@ fun BottomNavigationBar(
     var selectedItem by remember { mutableStateOf(0) }
 
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color(0xFF2196F3)
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
