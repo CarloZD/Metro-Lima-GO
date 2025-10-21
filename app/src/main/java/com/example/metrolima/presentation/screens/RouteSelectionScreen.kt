@@ -75,12 +75,16 @@ fun RouteDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Volver", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            "Volver",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2196F3),
-                    titleContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -97,7 +101,7 @@ fun RouteDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -106,7 +110,7 @@ fun RouteDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .background(Color(0xFFE3F2FD)),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -117,11 +121,11 @@ fun RouteDetailScreen(
                         Icons.Default.Map,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = Color(0xFF2196F3)
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
                         "Mapa de la ruta",
-                        color = Color(0xFF2196F3),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -136,7 +140,7 @@ fun RouteDetailScreen(
                     "Detalles del viaje",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 // Details Card
@@ -144,7 +148,7 @@ fun RouteDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
@@ -158,7 +162,10 @@ fun RouteDetailScreen(
                             subtitle = if (origin.isEmpty()) "No especificado" else origin
                         )
 
-                        Divider(color = Color.LightGray, thickness = 0.5.dp)
+                        Divider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            thickness = 0.5.dp
+                        )
 
                         DetailItem(
                             icon = Icons.Default.Place,
@@ -166,7 +173,10 @@ fun RouteDetailScreen(
                             subtitle = if (destination.isEmpty()) "No especificado" else destination
                         )
 
-                        Divider(color = Color.LightGray, thickness = 0.5.dp)
+                        Divider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            thickness = 0.5.dp
+                        )
 
                         DetailItem(
                             icon = Icons.Default.Schedule,
@@ -174,7 +184,10 @@ fun RouteDetailScreen(
                             subtitle = "45 minutos"
                         )
 
-                        Divider(color = Color.LightGray, thickness = 0.5.dp)
+                        Divider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            thickness = 0.5.dp
+                        )
 
                         DetailItem(
                             icon = Icons.Default.Train,
@@ -194,7 +207,7 @@ fun RouteDetailScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2196F3)
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -244,7 +257,7 @@ fun RouteDetailScreen(
                     "Rutas favoritas",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.paddingFromBaseline(top = 24.dp)
                 )
 
@@ -277,7 +290,7 @@ private fun DetailItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color(0xFF2196F3),
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(28.dp)
         )
 
@@ -286,14 +299,14 @@ private fun DetailItem(
                 title,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 subtitle,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -305,7 +318,7 @@ private fun FavoriteRouteCard(route: FavoriteRouteItem) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -343,13 +356,13 @@ private fun FavoriteRouteCard(route: FavoriteRouteItem) {
                         route.name,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         route.line,
                         fontSize = 14.sp,
-                        color = Color(0xFF2196F3)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -358,7 +371,7 @@ private fun FavoriteRouteCard(route: FavoriteRouteItem) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Eliminar",
-                    tint = Color.Gray
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
@@ -374,30 +387,54 @@ private fun BottomNavigationBar(
     onNavigateToSettings: () -> Unit
 ) {
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color(0xFF2196F3),
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
         modifier = Modifier.height(60.dp)
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Home", fontSize = 8.sp) },
             selected = selectedItem == 0,
             onClick = onNavigateToHome
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Train,
+                    contentDescription = "Estaciones",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Estaciones", fontSize = 8.sp) },
             selected = selectedItem == 1,
             onClick = onNavigateToStations
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Map,
+                    contentDescription = "Rutas",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Rutas", fontSize = 8.sp) },
             selected = selectedItem == 2,
             onClick = onNavigateToRoutes
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración", modifier = Modifier.size(20.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = "Configuración",
+                    modifier = Modifier.size(20.dp)
+                )
+            },
             label = { Text("Configuración", fontSize = 8.sp) },
             selected = selectedItem == 3,
             onClick = onNavigateToSettings
