@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,10 +45,7 @@ fun StationsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Estaciones",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Estaciones", fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -61,16 +57,16 @@ fun StationsScreen(
                     }
                 },
                 actions = {
-                    // Botón de filtro por línea
+                    // 🔽 Botón de filtro
                     IconButton(onClick = { showFilterMenu = true }) {
                         Icon(
                             Icons.Default.FilterList,
-                            contentDescription = "Filtrar",
+                            contentDescription = "Filtrar por línea",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
 
-                    // Menú desplegable
+                    // Menú desplegable de líneas
                     DropdownMenu(
                         expanded = showFilterMenu,
                         onDismissRequest = { showFilterMenu = false }
@@ -107,6 +103,8 @@ fun StationsScreen(
                 )
             )
         },
+
+        // Barra inferior de navegación
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -154,7 +152,7 @@ fun StationsScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
-            // Chip de filtro actual
+            // Chip de filtro activo
             if (selectedLine != "Todas") {
                 Row(
                     modifier = Modifier
@@ -168,12 +166,7 @@ fun StationsScreen(
                             selectedLine = "Todas"
                             viewModel.searchEstaciones("")
                         },
-                        label = {
-                            Text(
-                                "Filtrando: $selectedLine",
-                                fontSize = 12.sp
-                            )
-                        },
+                        label = { Text("Filtrando: $selectedLine", fontSize = 12.sp) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.FilterList,
@@ -199,41 +192,22 @@ fun StationsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = {
-                    Text(
-                        "Buscar estación o distrito",
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                },
+                placeholder = { Text("Buscar estación o distrito") },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
+                    Icon(Icons.Default.Search, contentDescription = null)
                 },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.searchEstaciones("") }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Limpiar",
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
+                            Icon(Icons.Default.Clear, contentDescription = "Limpiar")
                         }
                     }
                 },
                 shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                ),
                 singleLine = true
             )
 
-            // Contador de resultados
+            // Conteo de resultados
             Text(
                 "${estaciones.size} estaciones encontradas",
                 fontSize = 12.sp,
@@ -241,63 +215,54 @@ fun StationsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            // Mostrar loading o lista
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary
-                    )
+            // Mostrar lista o estados vacíos
+            when {
+                isLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
                 }
-            } else if (estaciones.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.SearchOff,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            "No se encontraron estaciones",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                        )
-                        if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextButton(
-                                onClick = {
+
+                estaciones.isEmpty() -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.SearchOff,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "No se encontraron estaciones",
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                            )
+                            if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                TextButton(onClick = {
                                     selectedLine = "Todas"
                                     viewModel.searchEstaciones("")
+                                }) {
+                                    Text("Limpiar filtros")
                                 }
-                            ) {
-                                Text("Limpiar filtros")
                             }
                         }
                     }
                 }
-            } else {
-                // Lista de estaciones desde Room
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(estaciones) { estacion ->
-                        StationItem(
-                            id = estacion.id,
-                            name = estacion.nombre,
-                            line = estacion.linea,
-                            district = estacion.distrito,
-                            imageRes = estacion.imagenRes,
-                            onClick = { onStationClick(estacion.id) }
-                        )
+
+                else -> {
+                    LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                        items(estaciones) { estacion ->
+                            StationItem(
+                                id = estacion.id,
+                                name = estacion.nombre,
+                                line = estacion.linea,
+                                district = estacion.distrito,
+                                imageRes = estacion.imagenRes,
+                                onClick = { onStationClick(estacion.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -305,6 +270,7 @@ fun StationsScreen(
     }
 }
 
+// ---- Tarjeta individual de estación ----
 @Composable
 fun StationItem(
     id: Int,
@@ -319,15 +285,10 @@ fun StationItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (imageRes != 0) {
                 Image(
                     painter = painterResource(imageRes),
@@ -363,11 +324,7 @@ fun StationItem(
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    // Badge de línea
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(4.dp)
@@ -380,6 +337,7 @@ fun StationItem(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         district,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),

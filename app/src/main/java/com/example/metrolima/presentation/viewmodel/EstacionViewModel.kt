@@ -68,4 +68,11 @@ class EstacionViewModel(application: Application) : AndroidViewModel(application
             repository.insertEstacion(estacion)
         }
     }
+
+    fun actualizarDesdeAPI() {
+        viewModelScope.launch {
+            repository.refreshEstacionesDesdeAPI()
+            loadEstaciones()
+        }
+    }
 }

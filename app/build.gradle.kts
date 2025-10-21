@@ -67,6 +67,13 @@ dependencies {
     // --- Testing / debug ---
     implementation("com.google.maps.android:maps-compose:4.3.0")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+// (Opcional pero recomendado)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

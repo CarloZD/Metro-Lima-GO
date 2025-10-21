@@ -52,10 +52,9 @@ abstract class MetroDatabase : RoomDatabase() {
             }
 
             suspend fun populateDatabase(estacionDao: EstacionDao) {
-                // Limpiar la base de datos
                 estacionDao.deleteAllEstaciones()
 
-                // Insertar estaciones iniciales
+                // Datos iniciales de ejemplo (Línea 1 y Línea 2)
                 val estaciones = listOf(
                     Estacion(
                         nombre = "Estación La Cultura",
@@ -78,69 +77,30 @@ abstract class MetroDatabase : RoomDatabase() {
                         imagenRes = R.drawable.estacion2
                     ),
                     Estacion(
-                        nombre = "Estación Villa El Salvador",
-                        linea = "Línea 1",
-                        distrito = "Villa El Salvador",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -12.215833,
-                        longitud = -76.938611,
+                        nombre = "Estación Santa Anita",
+                        linea = "Línea 2",
+                        distrito = "Santa Anita",
+                        horarioApertura = "06:00 AM",
+                        horarioCierre = "09:30 PM",
+                        latitud = -12.0525,
+                        longitud = -76.9719,
                         imagenRes = R.drawable.estacion3
                     ),
                     Estacion(
-                        nombre = "Estación Los Jardines",
-                        linea = "Línea 1",
-                        distrito = "San Juan de Lurigancho",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -11.987500,
-                        longitud = -76.977778,
+                        nombre = "Estación Mercado de Santa Anita",
+                        linea = "Línea 2",
+                        distrito = "Santa Anita",
+                        horarioApertura = "06:00 AM",
+                        horarioCierre = "09:30 PM",
+                        latitud = -12.0551,
+                        longitud = -76.9687,
                         imagenRes = R.drawable.estacion4
-                    ),
-                    Estacion(
-                        nombre = "Estación San Carlos",
-                        linea = "Línea 1",
-                        distrito = "San Juan de Lurigancho",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -11.999444,
-                        longitud = -76.983889,
-                        imagenRes = R.drawable.estacion5
-                    ),
-                    Estacion(
-                        nombre = "Estación Grau",
-                        linea = "Línea 1",
-                        distrito = "Lima",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -12.046374,
-                        longitud = -77.042793,
-                        imagenRes = R.drawable.estacion1
-                    ),
-                    Estacion(
-                        nombre = "Estación Gamarra",
-                        linea = "Línea 1",
-                        distrito = "La Victoria",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -12.064722,
-                        longitud = -77.014444,
-                        imagenRes = R.drawable.estacion2
-                    ),
-                    Estacion(
-                        nombre = "Estación San Martín",
-                        linea = "Línea 1",
-                        distrito = "Lima",
-                        horarioApertura = "05:30 AM",
-                        horarioCierre = "10:00 PM",
-                        latitud = -12.051944,
-                        longitud = -77.029722,
-                        imagenRes = R.drawable.estacion3
                     )
                 )
 
                 estacionDao.insertAllEstaciones(estaciones)
             }
+
         }
     }
 }
