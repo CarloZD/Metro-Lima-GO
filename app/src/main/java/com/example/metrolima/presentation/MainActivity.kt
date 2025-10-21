@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.metrolima.presentation.navigation.MetroNavigation
+import com.example.metrolima.presentation.screens.RouteDetailScreenWithButtons
 import com.example.metrolima.ui.theme.MetroLimaTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +19,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MetroNavigation()
+                    RouteDetailScreenWithButtons(
+                        origin = "Estación Central",
+                        destination = "San Juan",
+                        onBack = {},
+                        onSaveRoute = {}
+                    )
                 }
             }
         }

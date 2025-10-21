@@ -1,6 +1,9 @@
 package com.example.metrolima.presentation.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +32,9 @@ fun RouteDetailScreenWithButtons(
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
-){
+) {
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,16 +71,30 @@ fun RouteDetailScreenWithButtons(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            // 🔹 Mapa clickeable
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .background(Color(0xFFE3F2FD), RoundedCornerShape(12.dp)),
+                    .background(Color(0xFFE3F2FD), RoundedCornerShape(12.dp))
+                    .clickable {
+                        val gmmIntentUri = Uri.parse("geo:-12.0464,-77.0428?q=Metro+de+Lima")
+                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                        mapIntent.setPackage("com.google.android.apps.maps")
+
+                        if (mapIntent.resolveActivity(context.packageManager) != null) {
+                            context.startActivity(mapIntent)
+                        } else {
+                            val browserIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                            context.startActivity(browserIntent)
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Map, null, Modifier.size(64.dp), Color(0xFF2196F3))
-                    Text("Mapa de la ruta", color = Color(0xFF2196F3), fontSize = 16.sp)
+                    Text("Mapa de la ruta (toca para abrir)", color = Color(0xFF2196F3), fontSize = 16.sp)
                 }
             }
 
