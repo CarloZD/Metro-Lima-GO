@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metrolima.presentation.components.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +50,7 @@ fun RouteDetailScreenWithButtons(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            "Volver",
+                            contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -79,8 +80,7 @@ fun RouteDetailScreenWithButtons(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            // 🔹 Mapa clickeable con tema oscuro
+            // 🔹 Mapa clickeable
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,47 +134,20 @@ fun RouteDetailScreenWithButtons(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    DetailRow(
-                        Icons.Default.LocationOn,
-                        "Origen",
-                        origin.ifEmpty { "No especificado" }
-                    )
-                    Divider(
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        thickness = 0.5.dp
-                    )
-                    DetailRow(
-                        Icons.Default.Place,
-                        "Destino",
-                        destination.ifEmpty { "No especificado" }
-                    )
-                    Divider(
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        thickness = 0.5.dp
-                    )
-                    DetailRow(
-                        Icons.Default.Schedule,
-                        "Tiempo estimado",
-                        "45 minutos"
-                    )
-                    Divider(
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        thickness = 0.5.dp
-                    )
-                    DetailRow(
-                        Icons.Default.Train,
-                        "Estaciones intermedias",
-                        "15 estaciones"
-                    )
+                    DetailRow(Icons.Default.LocationOn, "Origen", origin.ifEmpty { "No especificado" })
+                    Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
+                    DetailRow(Icons.Default.Place, "Destino", destination.ifEmpty { "No especificado" })
+                    Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
+                    DetailRow(Icons.Default.Schedule, "Tiempo estimado", "45 minutos")
+                    Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
+                    DetailRow(Icons.Default.Train, "Estaciones intermedias", "15 estaciones")
                 }
             }
 
@@ -183,44 +156,27 @@ fun RouteDetailScreenWithButtons(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = { onSaveRoute() },
+                    onClick = onSaveRoute,
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Star,
-                        null,
-                        Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Default.Star, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(
-                        "Guardar ruta",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Text("Guardar ruta", fontSize = 13.sp, fontWeight = FontWeight.Medium)
                 }
 
                 Button(
-                    onClick = { onSaveRoute() },
+                    onClick = { /* Aquí puedes redirigir a Favoritos o guardar */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Favorite,
-                        null,
-                        Modifier.size(18.dp),
-                        Color.White
-                    )
+                    Icon(Icons.Default.Favorite, null, Modifier.size(18.dp), Color.White)
                     Spacer(Modifier.width(6.dp))
                     Text(
                         "Favoritos",
@@ -264,68 +220,3 @@ private fun DetailRow(icon: ImageVector, title: String, subtitle: String) {
         }
     }
 }
-
-@Composable
-private fun BottomNavigationBar(
-    selectedItem: Int,
-    onNavigateToHome: () -> Unit,
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
-) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.height(60.dp)
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Home", fontSize = 8.sp) },
-            selected = selectedItem == 0,
-            onClick = onNavigateToHome
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Train,
-                    contentDescription = "Estaciones",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Estaciones", fontSize = 8.sp) },
-            selected = selectedItem == 1,
-            onClick = onNavigateToStations
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Map,
-                    contentDescription = "Rutas",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Rutas", fontSize = 8.sp) },
-            selected = selectedItem == 2,
-            onClick = onNavigateToRoutes
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = "Configuración",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Configuración", fontSize = 8.sp) },
-            selected = selectedItem == 3,
-            onClick = onNavigateToSettings
-        )
-    }
-}
-// Commit

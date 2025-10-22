@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metrolima.presentation.components.BottomNavigationBar
 
 data class FavoriteRoute(
     val id: Int,
@@ -32,11 +33,14 @@ data class FavoriteStation(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToStations: () -> Unit = {},
+    onNavigateToRoutes: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(0) }
 
-    // Sample favorite routes list
     var favoriteRoutes by remember {
         mutableStateOf(
             listOf(
@@ -48,7 +52,6 @@ fun FavoritesScreen(
         )
     }
 
-    // Sample favorite stations list
     var favoriteStations by remember {
         mutableStateOf(
             listOf(
@@ -74,7 +77,7 @@ fun FavoritesScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            "Volver",
+                            contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -87,11 +90,11 @@ fun FavoritesScreen(
         },
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = 2,
-                onNavigateToHome = onBack,
-                onNavigateToStations = { },
-                onNavigateToRoutes = { },
-                onNavigateToSettings = { }
+                selectedItem = 2, // resalta el ítem "Rutas"
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToStations = onNavigateToStations,
+                onNavigateToRoutes = onNavigateToRoutes,
+                onNavigateToSettings = onNavigateToSettings
             )
         }
     ) { padding ->
@@ -101,7 +104,7 @@ fun FavoritesScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
-            // Tab Row
+            // Tabs
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -119,116 +122,107 @@ fun FavoritesScreen(
                 )
             }
 
-            // Content based on selected tab
+            // Contenido según pestaña seleccionada
             when (selectedTab) {
-                0 -> {
-                    if (favoriteRoutes.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Star,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(80.dp),
-                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
-                                )
-                                Text(
-                                    "No tienes rutas favoritas",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                                )
-                                Text(
-                                    "Guarda tus rutas frecuentes aquí",
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                                )
-                            }
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(favoriteRoutes) { route ->
-                                FavoriteRouteItem(
-                                    route = route,
-                                    onDelete = {
-                                        favoriteRoutes = favoriteRoutes.filter { it.id != route.id }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                1 -> {
-                    if (favoriteStations.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Train,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(80.dp),
-                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
-                                )
-                                Text(
-                                    "No tienes estaciones favoritas",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                                )
-                                Text(
-                                    "Guarda tus estaciones frecuentes aquí",
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                                )
-                            }
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(favoriteStations) { station ->
-                                FavoriteStationItem(
-                                    station = station,
-                                    onDelete = {
-                                        favoriteStations = favoriteStations.filter { it.id != station.id }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
+                0 -> FavoriteRoutesList(
+                    favoriteRoutes = favoriteRoutes,
+                    onDelete = { id -> favoriteRoutes = favoriteRoutes.filter { it.id != id } }
+                )
+
+                1 -> FavoriteStationsList(
+                    favoriteStations = favoriteStations,
+                    onDelete = { id -> favoriteStations = favoriteStations.filter { it.id != id } }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun FavoriteRouteItem(
-    route: FavoriteRoute,
-    onDelete: () -> Unit
+private fun FavoriteRoutesList(
+    favoriteRoutes: List<FavoriteRoute>,
+    onDelete: (Int) -> Unit
 ) {
+    if (favoriteRoutes.isEmpty()) {
+        EmptyState(
+            icon = Icons.Default.Star,
+            message = "No tienes rutas favoritas",
+            hint = "Guarda tus rutas frecuentes aquí"
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(favoriteRoutes) { route ->
+                FavoriteRouteItem(route = route, onDelete = { onDelete(route.id) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun FavoriteStationsList(
+    favoriteStations: List<FavoriteStation>,
+    onDelete: (Int) -> Unit
+) {
+    if (favoriteStations.isEmpty()) {
+        EmptyState(
+            icon = Icons.Default.Train,
+            message = "No tienes estaciones favoritas",
+            hint = "Guarda tus estaciones frecuentes aquí"
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(favoriteStations) { station ->
+                FavoriteStationItem(station = station, onDelete = { onDelete(station.id) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, message: String, hint: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.size(80.dp),
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+            )
+            Text(
+                message,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+            Text(
+                hint,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -246,10 +240,7 @@ private fun FavoriteRouteItem(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(
-                            color = Color(0xFFFFF9C4),
-                            shape = RoundedCornerShape(12.dp)
-                        ),
+                        .background(Color(0xFFFFF9C4), shape = RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -261,43 +252,25 @@ private fun FavoriteRouteItem(
                 }
 
                 Column {
-                    Text(
-                        route.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text(route.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        route.line,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Text(route.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                 }
             }
 
             IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = "Eliminar",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                Icon(Icons.Default.Close, contentDescription = "Eliminar")
             }
         }
     }
 }
 
 @Composable
-private fun FavoriteStationItem(
-    station: FavoriteStation,
-    onDelete: () -> Unit
-) {
+private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -330,18 +303,9 @@ private fun FavoriteStationItem(
                 }
 
                 Column {
-                    Text(
-                        station.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text(station.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        station.line,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Text(station.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         station.district,
@@ -352,51 +316,8 @@ private fun FavoriteStationItem(
             }
 
             IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = "Eliminar",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                Icon(Icons.Default.Close, contentDescription = "Eliminar")
             }
         }
-    }
-}
-
-@Composable
-private fun BottomNavigationBar(
-    selectedItem: Int,
-    onNavigateToHome: () -> Unit,
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
-) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary
-    ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 10.sp) },
-            selected = selectedItem == 0,
-            onClick = onNavigateToHome
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones") },
-            label = { Text("Estaciones", fontSize = 10.sp) },
-            selected = selectedItem == 1,
-            onClick = onNavigateToStations
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas") },
-            label = { Text("Rutas", fontSize = 10.sp) },
-            selected = selectedItem == 2,
-            onClick = onNavigateToRoutes
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración", fontSize = 10.sp) },
-            selected = selectedItem == 3,
-            onClick = onNavigateToSettings
-        )
     }
 }

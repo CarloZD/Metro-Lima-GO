@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metrolima.presentation.components.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +55,7 @@ fun AboutScreen(
         },
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = 0,
+                selectedItem = 3, // Cambia este número según la pantalla actual
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
@@ -71,7 +72,6 @@ fun AboutScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Equipo de Desarrollo
             Text(
                 "Equipo de Desarrollo",
                 fontSize = 18.sp,
@@ -91,87 +91,12 @@ fun AboutScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Desarrollador 1
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            "Desarrollador",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    // Desarrolladora
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            "Desarrolladora",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                    // Desarrollador 2
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Text(
-                            "Desarrollador",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    InfoRow("Desarrollador 1", "Backend")
+                    InfoRow("Desarrolladora 2", "Frontend")
+                    InfoRow("Desarrollador 3", "UI/UX")
                 }
             }
 
-            // Información de la Aplicación
             Text(
                 "Información de la Aplicación",
                 fontSize = 18.sp,
@@ -193,11 +118,10 @@ fun AboutScreen(
                 ) {
                     InfoRow("Versión", "1.0.0")
                     InfoRow("Fecha de Lanzamiento", "24 de octubre 2025")
-                    InfoRow("Idioma y Modo", "")
+                    InfoRow("Idioma", "Español")
                 }
             }
 
-            // Agradecimientos
             Text(
                 "Agradecimientos",
                 fontSize = 18.sp,
@@ -214,7 +138,7 @@ fun AboutScreen(
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Text(
-                    "Agradecemos a todos los usuarios por su apoyo y retroalimentación, que nos ayudan a mejorar continuamente la aplicación. También agradecemos a las autoridades del Metro de Lima por su colaboración.",
+                    "Agradecemos a todos los usuarios por su apoyo y retroalimentación...",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(16.dp)
@@ -231,79 +155,7 @@ private fun InfoRow(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            label,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            value,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
-    }
-}
-
-@Composable
-private fun BottomNavigationBar(
-    selectedItem: Int,
-    onNavigateToHome: () -> Unit,
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
-) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.height(60.dp)
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Home", fontSize = 8.sp) },
-            selected = selectedItem == 0,
-            onClick = onNavigateToHome
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Train,
-                    contentDescription = "Estaciones",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Estaciones", fontSize = 8.sp) },
-            selected = selectedItem == 1,
-            onClick = onNavigateToStations
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Map,
-                    contentDescription = "Rutas",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Rutas", fontSize = 8.sp) },
-            selected = selectedItem == 2,
-            onClick = onNavigateToRoutes
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = "Configuración",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Configuración", fontSize = 8.sp) },
-            selected = selectedItem == 3,
-            onClick = onNavigateToSettings
-        )
+        Text(label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+        Text(value, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }

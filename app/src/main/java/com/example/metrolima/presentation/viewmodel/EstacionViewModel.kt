@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metrolima.data.database.MetroDatabase
 import com.example.metrolima.data.model.Estacion
+import com.example.metrolima.data.network.RetrofitInstance
 import com.example.metrolima.data.repository.EstacionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,4 +76,29 @@ class EstacionViewModel(application: Application) : AndroidViewModel(application
             loadEstaciones()
         }
     }
+    fun loadEstacionesRemotas() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = RetrofitInstance.api.getEstacionesRemotas()
+                _estaciones.value = response.map {
+                    Estacion(
+                        nombre = it.nombre,
+                        linea = it.linea,
+                        distrito = it.distrito,
+                        horarioApertura = it.horarioApertura,
+                        horarioCierre = it.horarioCierre,
+                        latitud = it.latitud,
+                        longitud = it.longitud,
+                        imagenRes = 0
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 }

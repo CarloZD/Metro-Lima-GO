@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.ui.graphics)
 
     // --- Room (Base de Datos) ---
     val roomVersion = "2.6.1"

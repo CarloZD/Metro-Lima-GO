@@ -91,18 +91,7 @@ fun MetroNavigation() {
         }
 
         // Detalle de ruta
-        composable(Screen.RouteDetail.route) { backStackEntry ->
-            val origin = backStackEntry.arguments?.getString("origin") ?: "Desconocido"
-            val destination = backStackEntry.arguments?.getString("destination") ?: "Desconocido"
-            RouteDetailScreen(
-                origin = origin,
-                destination = destination,
-                onBack = { navController.popBackStack() },
-                onSaveRoute = {
-                    navController.navigate(Screen.Favorites.route)
-                }
-            )
-        }
+
 
         // Configuración
         composable(Screen.Settings.route) {
@@ -134,13 +123,11 @@ fun MetroNavigation() {
             )
         }
 
+
         // Rutas - Pantalla de selección de rutas
         composable(Screen.Routes.route) {
             RouteSelectionScreen(
                 onBack = { navController.popBackStack() },
-                onNavigateToFavorites = {
-                    navController.navigate(Screen.Favorites.route)
-                },
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
@@ -151,6 +138,7 @@ fun MetroNavigation() {
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
             )
         }
+
     }
 }
 

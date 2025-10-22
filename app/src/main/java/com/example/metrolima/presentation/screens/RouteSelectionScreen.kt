@@ -1,5 +1,6 @@
 package com.example.metrolima.presentation.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,78 +9,50 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class FavoriteRouteItem(
-    val id: Int,
-    val name: String,
-    val line: String
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metrolima.R
+import com.example.metrolima.data.model.Estacion
+import com.example.metrolima.presentation.viewmodel.EstacionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteSelectionScreen(
-    onBack: () -> Unit,
-    onNavigateToFavorites: () -> Unit = {},
+    viewModel: EstacionViewModel = viewModel(),
+    onBack: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
 ) {
-    RouteDetailScreenWithButtons(
-        origin = "Estación Central",
-        destination = "Estación Villa El Salvador",
-        onBack = onBack,
-        onSaveRoute = onNavigateToFavorites,
-        onNavigateToHome = onNavigateToHome,
-        onNavigateToStations = onNavigateToStations,
-        onNavigateToRoutes = onNavigateToRoutes,
-        onNavigateToSettings = onNavigateToSettings
-    )
-}
+    val estaciones by viewModel.estaciones.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RouteDetailScreen(
-    origin: String,
-    destination: String,
-    onBack: () -> Unit,
-    onSaveRoute: () -> Unit
-) {
-    val favoriteRoutes = remember {
-        listOf(
-            FavoriteRouteItem(1, "Estación Villa El Salvador", "Línea 1"),
-            FavoriteRouteItem(2, "Estación 28 de Julio", "Línea 2"),
-            FavoriteRouteItem(3, "Estación Cabitos", "Línea 1"),
-            FavoriteRouteItem(4, "Estación San Juan", "Línea 2")
-        )
+    LaunchedEffect(Unit) {
+        viewModel.loadEstacionesRemotas()
     }
+
+    var origen by remember { mutableStateOf<Estacion?>(null) }
+    var destino by remember { mutableStateOf<Estacion?>(null) }
+    var tiempoEstimado by remember { mutableStateOf<String?>(null) }
+    var estacionesIntermedias by remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        "Ruta",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                },
+                title = { Text("Ruta", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            "Volver",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -91,287 +64,166 @@ fun RouteDetailScreen(
         bottomBar = {
             BottomNavigationBar(
                 selectedItem = 2,
-                onNavigateToHome = onBack,
-                onNavigateToStations = { },
-                onNavigateToRoutes = { },
-                onNavigateToSettings = { }
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToStations = onNavigateToStations,
+                onNavigateToRoutes = onNavigateToRoutes,
+                onNavigateToSettings = onNavigateToSettings
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Map Placeholder
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Map,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        "Mapa de la ruta",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+        if (isLoading) {
+            Box(Modifier.fillMaxSize().padding(padding), Alignment.Center) {
+                CircularProgressIndicator()
             }
-
+        } else {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    "Detalles del viaje",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                // Details Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        DetailItem(
-                            icon = Icons.Default.LocationOn,
-                            title = "Origen",
-                            subtitle = if (origin.isEmpty()) "No especificado" else origin
-                        )
-
-                        Divider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 0.5.dp
-                        )
-
-                        DetailItem(
-                            icon = Icons.Default.Place,
-                            title = "Destino",
-                            subtitle = if (destination.isEmpty()) "No especificado" else destination
-                        )
-
-                        Divider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 0.5.dp
-                        )
-
-                        DetailItem(
-                            icon = Icons.Default.Schedule,
-                            title = "Tiempo estimado",
-                            subtitle = "45 minutos"
-                        )
-
-                        Divider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 0.5.dp
-                        )
-
-                        DetailItem(
-                            icon = Icons.Default.Train,
-                            title = "Estaciones intermedias",
-                            subtitle = "15 estaciones"
-                        )
-                    }
-                }
-
-                // Save Route Button
-                Button(
-                    onClick = {
-                        onSaveRoute()
-                        onBack()
-                    },
+                // 🔹 Mapa placeholder (imagen superior)
+                Image(
+                    painter = painterResource(id = R.drawable.mapa_lima), // usa una imagen local o placeholder
+                    contentDescription = "Mapa de la ruta",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Guardar ruta",
-                        fontSize = 16.sp,
+                        "Detalles del viaje",
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
-                }
 
-                // Add to Favorites Button
-                Button(
-                    onClick = {
-                        onSaveRoute()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFC107)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.White
+                    // 🔹 Origen
+                    InfoCard(
+                        icon = Icons.Default.LocationOn,
+                        title = "Origen",
+                        value = origen?.nombre ?: "Selecciona una estación"
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Agregar a favoritos",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+
+                    // 🔹 Destino
+                    InfoCard(
+                        icon = Icons.Default.Place,
+                        title = "Destino",
+                        value = destino?.nombre ?: "Selecciona una estación"
                     )
-                }
 
-                // Favorite Routes Section Title
-                Text(
-                    "Rutas favoritas",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.paddingFromBaseline(top = 24.dp)
-                )
+                    // 🔹 Dropdowns
+                    EstacionDropdown("Seleccionar origen", estaciones) { origen = it }
+                    EstacionDropdown("Seleccionar destino", estaciones) { destino = it }
 
-                // Favorite Routes List
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    favoriteRoutes.forEach { route ->
-                        FavoriteRouteCard(route = route)
+                    // 🔹 Calcular ruta
+                    Button(
+                        onClick = {
+                            if (origen != null && destino != null) {
+                                val tiempo = (15..45).random()
+                                val intermedias = (5..20).random()
+                                tiempoEstimado = "$tiempo minutos"
+                                estacionesIntermedias = intermedias
+                            }
+                        },
+                        enabled = origen != null && destino != null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.DirectionsTransit, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Calcular ruta")
+                    }
+
+                    // 🔹 Resultado
+                    if (tiempoEstimado != null) {
+                        InfoCard(
+                            icon = Icons.Default.Schedule,
+                            title = "Tiempo estimado",
+                            value = tiempoEstimado!!
+                        )
+                        InfoCard(
+                            icon = Icons.Default.Train,
+                            title = "Estaciones intermedias",
+                            value = estacionesIntermedias.toString()
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = {},
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1976D2)
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text("Guardar ruta", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
 }
 
 @Composable
-private fun DetailItem(
-    icon: ImageVector,
-    title: String,
-    subtitle: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(28.dp)
-        )
-
-        Column {
-            Text(
-                title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                subtitle,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
-@Composable
-private fun FavoriteRouteCard(route: FavoriteRouteItem) {
+fun InfoCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, value: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(2.dp)
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            color = Color(0xFFFFF9C4),
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+                Text(value, fontWeight = FontWeight.Medium, fontSize = 16.sp)
+            }
+        }
+    }
+}
 
-                Column {
-                    Text(
-                        route.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        route.line,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+@Composable
+fun EstacionDropdown(label: String, estaciones: List<Estacion>, onSelect: (Estacion) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedName by remember { mutableStateOf("") }
+
+    Box {
+        OutlinedTextField(
+            value = selectedName,
+            onValueChange = {},
+            label = { Text(label) },
+            readOnly = true,
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(Icons.Default.ArrowDropDown, null)
                 }
             }
-
-            IconButton(onClick = { }) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = "Eliminar",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            estaciones.forEach {
+                DropdownMenuItem(
+                    text = { Text(it.nombre) },
+                    onClick = {
+                        selectedName = it.nombre
+                        onSelect(it)
+                        expanded = false
+                    }
                 )
             }
         }
@@ -379,63 +231,35 @@ private fun FavoriteRouteCard(route: FavoriteRouteItem) {
 }
 
 @Composable
-private fun BottomNavigationBar(
+fun BottomNavigationBar(
     selectedItem: Int,
     onNavigateToHome: () -> Unit,
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.height(60.dp)
-    ) {
+    NavigationBar {
         NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Home", fontSize = 8.sp) },
+            icon = { Icon(Icons.Default.Home, null) },
+            label = { Text("Home", fontSize = 10.sp) },
             selected = selectedItem == 0,
             onClick = onNavigateToHome
         )
         NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Train,
-                    contentDescription = "Estaciones",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Estaciones", fontSize = 8.sp) },
+            icon = { Icon(Icons.Default.Train, null) },
+            label = { Text("Estaciones", fontSize = 10.sp) },
             selected = selectedItem == 1,
             onClick = onNavigateToStations
         )
         NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Map,
-                    contentDescription = "Rutas",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Rutas", fontSize = 8.sp) },
+            icon = { Icon(Icons.Default.Map, null) },
+            label = { Text("Rutas", fontSize = 10.sp) },
             selected = selectedItem == 2,
             onClick = onNavigateToRoutes
         )
         NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = "Configuración",
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            label = { Text("Configuración", fontSize = 8.sp) },
+            icon = { Icon(Icons.Default.Settings, null) },
+            label = { Text("Configuración", fontSize = 10.sp) },
             selected = selectedItem == 3,
             onClick = onNavigateToSettings
         )
