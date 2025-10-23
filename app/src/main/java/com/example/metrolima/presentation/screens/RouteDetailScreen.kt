@@ -20,7 +20,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.metrolima.presentation.components.BottomNavigationBar
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,8 +37,10 @@ fun RouteDetailScreenWithButtons(
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
     val context = LocalContext.current
 
     Scaffold(
@@ -41,7 +48,7 @@ fun RouteDetailScreenWithButtons(
             TopAppBar(
                 title = {
                     Text(
-                        "Ruta",
+                        StringsManager.getString("route", isEnglish),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -50,7 +57,7 @@ fun RouteDetailScreenWithButtons(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = StringsManager.getString("back", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -67,7 +74,8 @@ fun RouteDetailScreenWithButtons(
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
-                onNavigateToSettings = onNavigateToSettings
+                onNavigateToSettings = onNavigateToSettings,
+                isEnglish = isEnglish
             )
         }
     ) { padding ->
@@ -111,13 +119,13 @@ fun RouteDetailScreenWithButtons(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        "Mapa de la ruta",
+                        StringsManager.getString("route_map", isEnglish),
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        "(toca para abrir)",
+                        StringsManager.getString("tap_to_open", isEnglish),
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                         fontSize = 12.sp
                     )
@@ -125,7 +133,7 @@ fun RouteDetailScreenWithButtons(
             }
 
             Text(
-                "Detalles del viaje",
+                StringsManager.getString("trip_details", isEnglish),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -141,13 +149,13 @@ fun RouteDetailScreenWithButtons(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    DetailRow(Icons.Default.LocationOn, "Origen", origin.ifEmpty { "No especificado" })
+                    DetailRow(Icons.Default.LocationOn, StringsManager.getString("origin", isEnglish), origin.ifEmpty { StringsManager.getString("not_specified", isEnglish) })
                     Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
-                    DetailRow(Icons.Default.Place, "Destino", destination.ifEmpty { "No especificado" })
+                    DetailRow(Icons.Default.Place, StringsManager.getString("destination", isEnglish), destination.ifEmpty { StringsManager.getString("not_specified", isEnglish) })
                     Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
-                    DetailRow(Icons.Default.Schedule, "Tiempo estimado", "45 minutos")
+                    DetailRow(Icons.Default.Schedule, StringsManager.getString("estimated_time", isEnglish), StringsManager.getString("45_minutes", isEnglish))
                     Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
-                    DetailRow(Icons.Default.Train, "Estaciones intermedias", "15 estaciones")
+                    DetailRow(Icons.Default.Train, StringsManager.getString("intermediate_stations", isEnglish), StringsManager.getString("15_stations", isEnglish))
                 }
             }
 
@@ -165,7 +173,7 @@ fun RouteDetailScreenWithButtons(
                 ) {
                     Icon(Icons.Default.Star, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Guardar ruta", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                    Text(StringsManager.getString("save_route", isEnglish), fontSize = 13.sp, fontWeight = FontWeight.Medium)
                 }
 
                 Button(
@@ -179,7 +187,7 @@ fun RouteDetailScreenWithButtons(
                     Icon(Icons.Default.Favorite, null, Modifier.size(18.dp), Color.White)
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        "Favoritos",
+                        StringsManager.getString("favorites", isEnglish),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White

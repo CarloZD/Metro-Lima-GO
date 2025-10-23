@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.data.model.ThemeMode
 import com.example.metrolima.presentation.viewmodel.ThemeViewModel
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,17 +27,20 @@ fun SettingsScreen(
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
     onNavigateToAbout: () -> Unit = {},
-    themeViewModel: ThemeViewModel = viewModel()
+    themeViewModel: ThemeViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
     // Observar el modo de tema actual
     val currentThemeMode by themeViewModel.themeMode.collectAsState()
+    // Observar el idioma actual
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Configuración",
+                        StringsManager.getString("configuration", isEnglish),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -44,7 +49,7 @@ fun SettingsScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = StringsManager.getString("back", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -60,7 +65,8 @@ fun SettingsScreen(
             SettingsBottomBar(
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
-                onNavigateToRoutes = onNavigateToRoutes
+                onNavigateToRoutes = onNavigateToRoutes,
+                isEnglish = isEnglish
             )
         }
     ) { padding ->
@@ -78,13 +84,13 @@ fun SettingsScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    "Tema",
+                    StringsManager.getString("theme", isEnglish),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    "Cambia entre modo claro y oscuro",
+                    StringsManager.getString("change_theme_description", isEnglish),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.padding(top = 4.dp)
@@ -98,7 +104,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Modo Claro",
+                        StringsManager.getString("light_mode", isEnglish),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -114,7 +120,7 @@ fun SettingsScreen(
                     )
 
                     Text(
-                        "Modo Oscuro",
+                        StringsManager.getString("dark_mode", isEnglish),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -134,7 +140,7 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "Usar tema del sistema",
+                            StringsManager.getString("use_system_theme", isEnglish),
                             fontSize = 12.sp
                         )
                     }
@@ -151,13 +157,13 @@ fun SettingsScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    "Idioma",
+                    StringsManager.getString("language", isEnglish),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    "Selecciona tu idioma preferido",
+                    StringsManager.getString("select_language_description", isEnglish),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.padding(top = 4.dp)
@@ -177,25 +183,17 @@ fun SettingsScreen(
                     )
 
                     Switch(
-                        checked = false,
-                        onCheckedChange = { },
-                        modifier = Modifier.scale(0.85f),
-                        enabled = false // Por ahora deshabilitado
+                        checked = isEnglish,
+                        onCheckedChange = { languageViewModel.setLanguage(it) },
+                        modifier = Modifier.scale(0.85f)
                     )
 
                     Text(
-                        "English",
+                        StringsManager.getString("english", isEnglish),
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-
-                Text(
-                    "Próximamente",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    modifier = Modifier.padding(top = 4.dp)
-                )
             }
 
             Spacer(modifier = Modifier.height(1.dp))
@@ -221,7 +219,7 @@ fun SettingsScreen(
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        "Acerca de",
+                        StringsManager.getString("about", isEnglish),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -246,7 +244,7 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Versión",
+                    StringsManager.getString("version", isEnglish),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -264,33 +262,34 @@ fun SettingsScreen(
 private fun SettingsBottomBar(
     onNavigateToHome: () -> Unit,
     onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit
+    onNavigateToRoutes: () -> Unit,
+    isEnglish: Boolean
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Home, contentDescription = StringsManager.getString("home", isEnglish)) },
+            label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
             selected = false,
             onClick = onNavigateToHome
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones") },
-            label = { Text("Estaciones", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Train, contentDescription = StringsManager.getString("stations", isEnglish)) },
+            label = { Text(StringsManager.getString("stations", isEnglish), fontSize = 10.sp) },
             selected = false,
             onClick = onNavigateToStations
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas") },
-            label = { Text("Rutas", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Map, contentDescription = StringsManager.getString("routes", isEnglish)) },
+            label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
             selected = false,
             onClick = onNavigateToRoutes
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración", fontSize = 10.sp) },
+            label = { Text(StringsManager.getString("configuration", isEnglish), fontSize = 10.sp) },
             selected = true,
             onClick = { }
         )

@@ -23,6 +23,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.R
 import com.example.metrolima.data.model.Estacion
 import com.example.metrolima.presentation.viewmodel.EstacionViewModel
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.presentation.components.BottomNavigationBar
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,10 +35,12 @@ fun RouteSelectionScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
     val estaciones by viewModel.estaciones.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadEstacionesRemotas()
@@ -49,10 +54,17 @@ fun RouteSelectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ruta", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        text = StringsManager.getString("route", isEnglish),
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = StringsManager.getString("back", isEnglish))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -67,7 +79,8 @@ fun RouteSelectionScreen(
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
-                onNavigateToSettings = onNavigateToSettings
+                onNavigateToSettings = onNavigateToSettings,
+                isEnglish = isEnglish
             )
         }
     ) { padding ->
@@ -99,28 +112,29 @@ fun RouteSelectionScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        "Detalles del viaje",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        text = StringsManager.getString("trip_details", isEnglish),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     // 🔹 Origen
                     InfoCard(
                         icon = Icons.Default.LocationOn,
-                        title = "Origen",
-                        value = origen?.nombre ?: "Selecciona una estación"
+                        title = StringsManager.getString("origin", isEnglish),
+                        value = origen?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
 
                     // 🔹 Destino
                     InfoCard(
                         icon = Icons.Default.Place,
-                        title = "Destino",
-                        value = destino?.nombre ?: "Selecciona una estación"
+                        title = StringsManager.getString("destination", isEnglish),
+                        value = destino?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
 
                     // 🔹 Dropdowns
-                    EstacionDropdown("Seleccionar origen", estaciones) { origen = it }
-                    EstacionDropdown("Seleccionar destino", estaciones) { destino = it }
+                    EstacionDropdown(StringsManager.getString("select_origin", isEnglish), estaciones) { origen = it }
+                    EstacionDropdown(StringsManager.getString("select_destination", isEnglish), estaciones) { destino = it }
 
                     // 🔹 Calcular ruta
                     Button(
@@ -140,19 +154,19 @@ fun RouteSelectionScreen(
                     ) {
                         Icon(Icons.Default.DirectionsTransit, null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Calcular ruta")
+                        Text(StringsManager.getString("calculate_route", isEnglish))
                     }
 
                     // 🔹 Resultado
                     if (tiempoEstimado != null) {
                         InfoCard(
                             icon = Icons.Default.Schedule,
-                            title = "Tiempo estimado",
+                            title = StringsManager.getString("estimated_time", isEnglish),
                             value = tiempoEstimado!!
                         )
                         InfoCard(
                             icon = Icons.Default.Train,
-                            title = "Estaciones intermedias",
+                            title = StringsManager.getString("intermediate_stations", isEnglish),
                             value = estacionesIntermedias.toString()
                         )
 
@@ -167,7 +181,7 @@ fun RouteSelectionScreen(
                                 .fillMaxWidth()
                                 .height(50.dp)
                         ) {
-                            Text("Guardar ruta", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(StringsManager.getString("save_route", isEnglish), color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -227,41 +241,5 @@ fun EstacionDropdown(label: String, estaciones: List<Estacion>, onSelect: (Estac
                 )
             }
         }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(
-    selectedItem: Int,
-    onNavigateToHome: () -> Unit,
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
-) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, null) },
-            label = { Text("Home", fontSize = 10.sp) },
-            selected = selectedItem == 0,
-            onClick = onNavigateToHome
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, null) },
-            label = { Text("Estaciones", fontSize = 10.sp) },
-            selected = selectedItem == 1,
-            onClick = onNavigateToStations
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, null) },
-            label = { Text("Rutas", fontSize = 10.sp) },
-            selected = selectedItem == 2,
-            onClick = onNavigateToRoutes
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, null) },
-            label = { Text("Configuración", fontSize = 10.sp) },
-            selected = selectedItem == 3,
-            onClick = onNavigateToSettings
-        )
     }
 }

@@ -54,6 +54,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.ui.graphics)
 
+    // --- Internacionalización y cambio de idioma ---
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.datastore.preferences)
+
     // --- Room (Base de Datos) ---
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")

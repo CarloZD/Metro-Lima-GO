@@ -19,9 +19,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.data.database.MetroDatabase
 import com.example.metrolima.data.model.Estacion
 import com.example.metrolima.data.repository.EstacionRepository
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +32,8 @@ fun StationDetailScreen(
     stationId: Int,
     onBack: () -> Unit,
     onNavigateToRoute: (String, String) -> Unit,
-    onNavigateToFavorites: () -> Unit = {}
+    onNavigateToFavorites: () -> Unit = {},
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()

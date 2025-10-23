@@ -18,9 +18,10 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  */
 class UserPreferencesRepository(private val context: Context) {
 
-    // Key para guardar el tema
+    // Keys para guardar preferencias
     private companion object {
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+        val LANGUAGE_KEY = stringPreferencesKey("language")
     }
 
     /**
@@ -55,6 +56,24 @@ class UserPreferencesRepository(private val context: Context) {
             ThemeMode.valueOf(preferences.map { it ?: ThemeMode.SYSTEM.name }.toString())
         } catch (e: Exception) {
             ThemeMode.SYSTEM
+        }
+    }
+
+    /**
+     * Flow que emite el idioma actual
+     * Por defecto es español ("es")
+     */
+    fun getLanguagePreference(): Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[LANGUAGE_KEY] ?: "es"
+        }
+
+    /**
+     * Guarda la preferencia de idioma
+     */
+    suspend fun saveLanguagePreference(languageCode: String) {
+        context.dataStore.edit { preferences ->
+            preferences[LANGUAGE_KEY] = languageCode
         }
     }
 }

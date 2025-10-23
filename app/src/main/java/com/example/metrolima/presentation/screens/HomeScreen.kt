@@ -20,20 +20,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Metro Lima",
+                        StringsManager.getString("metro_lima", isEnglish),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -48,7 +53,8 @@ fun HomeScreen(
             BottomNavigationBar(
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
-                onNavigateToSettings = onNavigateToSettings
+                onNavigateToSettings = onNavigateToSettings,
+                isEnglish = isEnglish
             )
         }
     ) { paddingValues ->
@@ -118,13 +124,13 @@ fun HomeScreen(
                     ) {
                         SearchField(
                             icon = Icons.Default.LocationOn,
-                            hint = "¿Hacia dónde vas?",
+                            hint = StringsManager.getString("where_to_go", isEnglish),
                             onClick = { onNavigateToRoutes() }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         SearchField(
                             icon = Icons.Default.MyLocation,
-                            hint = "Tu ubicación",
+                            hint = StringsManager.getString("your_location", isEnglish),
                             onClick = { /* Handle location */ }
                         )
                     }
@@ -134,7 +140,7 @@ fun HomeScreen(
             // Quick Access Section
             item {
                 Text(
-                    "ACCESO RÁPIDO",
+                    StringsManager.getString("quick_access", isEnglish),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
@@ -153,14 +159,14 @@ fun HomeScreen(
                 ) {
                     QuickAccessCard(
                         icon = Icons.Default.Schedule,
-                        title = "Estación Central",
+                        title = StringsManager.getString("central_station", isEnglish),
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToStations() }
                     )
                     QuickAccessCard(
                         icon = Icons.Default.Route,
-                        title = "Tus rutas",
-                        subtitle = "5 guardadas",
+                        title = StringsManager.getString("your_routes", isEnglish),
+                        subtitle = StringsManager.getString("saved_routes", isEnglish),
                         iconColor = Color(0xFF4CAF50),
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToRoutes() }
@@ -171,7 +177,7 @@ fun HomeScreen(
             // Stations List Section
             item {
                 Text(
-                    "ESTACIONES",
+                    StringsManager.getString("stations", isEnglish),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
@@ -182,7 +188,7 @@ fun HomeScreen(
             }
 
             // Station Items
-            items(getRecentStations()) { station ->
+            items(getRecentStations(isEnglish)) { station ->
                 StationListItem(
                     stationName = station,
                     onClick = { onNavigateToStations() }
@@ -321,7 +327,8 @@ fun StationListItem(
 fun BottomNavigationBar(
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    isEnglish: Boolean
 ) {
     var selectedItem by remember { mutableStateOf(0) }
 
@@ -330,14 +337,14 @@ fun BottomNavigationBar(
         contentColor = MaterialTheme.colorScheme.primary
     ) {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Home, contentDescription = StringsManager.getString("home", isEnglish)) },
+            label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
             selected = selectedItem == 0,
             onClick = { selectedItem = 0 }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones") },
-            label = { Text("Estaciones", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Train, contentDescription = StringsManager.getString("stations_nav", isEnglish)) },
+            label = { Text(StringsManager.getString("stations_nav", isEnglish), fontSize = 10.sp) },
             selected = selectedItem == 1,
             onClick = {
                 selectedItem = 1
@@ -345,8 +352,8 @@ fun BottomNavigationBar(
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Rutas") },
-            label = { Text("Rutas", fontSize = 10.sp) },
+            icon = { Icon(Icons.Default.Map, contentDescription = StringsManager.getString("routes", isEnglish)) },
+            label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
             selected = selectedItem == 2,
             onClick = {
                 selectedItem = 2
@@ -355,7 +362,7 @@ fun BottomNavigationBar(
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración", fontSize = 10.sp) },
+            label = { Text(StringsManager.getString("configuration_nav", isEnglish), fontSize = 10.sp) },
             selected = selectedItem == 3,
             onClick = {
                 selectedItem = 3
@@ -366,10 +373,10 @@ fun BottomNavigationBar(
 }
 
 // Mock data
-fun getRecentStations(): List<String> {
+fun getRecentStations(isEnglish: Boolean = false): List<String> {
     return listOf(
-        "Estación Central",
-        "Plaza Mayor",
+        StringsManager.getString("central_station", isEnglish),
+        StringsManager.getString("plaza_mayor", isEnglish),
         "Av. Principal"
     )
 }

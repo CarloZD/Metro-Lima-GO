@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metrolima.utils.StringsManager
 
 @Composable
 fun BottomNavigationBar(
@@ -15,7 +16,8 @@ fun BottomNavigationBar(
     onNavigateToHome: () -> Unit,
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    isEnglish: Boolean = false
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -24,28 +26,28 @@ fun BottomNavigationBar(
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 8.sp) },
+            label = { Text(StringsManager.getString("home", isEnglish), fontSize = 8.sp) },
             selected = selectedItem == 0,
             onClick = onNavigateToHome
         )
 
         NavigationBarItem(
             icon = { Icon(Icons.Default.Train, contentDescription = "Estaciones") },
-            label = { Text("Estaciones", fontSize = 8.sp) },
+            label = { Text(StringsManager.getString("stations_nav", isEnglish), fontSize = 8.sp) },
             selected = selectedItem == 1,
             onClick = onNavigateToStations
         )
 
         NavigationBarItem(
             icon = { Icon(Icons.Default.Map, contentDescription = "Rutas") },
-            label = { Text("Rutas", fontSize = 8.sp) },
+            label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 8.sp) },
             selected = selectedItem == 2,
             onClick = onNavigateToRoutes
         )
 
         NavigationBarItem(
             icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text("Configuración", fontSize = 8.sp) },
+            label = { Text(StringsManager.getString("configuration_nav", isEnglish), fontSize = 8.sp) },
             selected = selectedItem == 3,
             onClick = onNavigateToSettings
         )

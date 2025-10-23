@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,7 +19,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.presentation.components.BottomNavigationBar
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,14 +31,16 @@ fun AboutScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Acerca de MetroLima GO",
+                        StringsManager.getString("about_metro_lima", isEnglish),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
@@ -42,7 +49,7 @@ fun AboutScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = StringsManager.getString("back", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -73,7 +80,7 @@ fun AboutScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                "Equipo de Desarrollo",
+                StringsManager.getString("development_team", isEnglish),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -91,14 +98,14 @@ fun AboutScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    InfoRow("Desarrollador 1", "Backend")
-                    InfoRow("Desarrolladora 2", "Frontend")
-                    InfoRow("Desarrollador 3", "UI/UX")
+                    InfoRow(StringsManager.getString("developer_1", isEnglish), StringsManager.getString("backend", isEnglish))
+                    InfoRow(StringsManager.getString("developer_2", isEnglish), StringsManager.getString("frontend", isEnglish))
+                    InfoRow(StringsManager.getString("developer_3", isEnglish), StringsManager.getString("ui_ux", isEnglish))
                 }
             }
 
             Text(
-                "Información de la Aplicación",
+                StringsManager.getString("app_information", isEnglish),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -116,14 +123,14 @@ fun AboutScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    InfoRow("Versión", "1.0.0")
-                    InfoRow("Fecha de Lanzamiento", "24 de octubre 2025")
-                    InfoRow("Idioma", "Español")
+                    InfoRow(StringsManager.getString("version", isEnglish), "1.0.0")
+                    InfoRow(StringsManager.getString("release_date", isEnglish), StringsManager.getString("release_date_value", isEnglish))
+                    InfoRow(StringsManager.getString("language", isEnglish), StringsManager.getString("current_language", isEnglish))
                 }
             }
 
             Text(
-                "Agradecimientos",
+                StringsManager.getString("acknowledgments", isEnglish),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -138,7 +145,7 @@ fun AboutScreen(
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Text(
-                    "Agradecemos a todos los usuarios por su apoyo y retroalimentación...",
+                    StringsManager.getString("acknowledgments_text", isEnglish),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(16.dp)

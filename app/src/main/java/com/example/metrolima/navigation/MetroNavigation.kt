@@ -8,10 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.metrolima.presentation.screens.*
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 
 /* ---------------------------
    Definición de rutas
@@ -37,6 +39,7 @@ sealed class Screen(val route: String) {
 @Composable
 fun MetroNavigation() {
     val navController = rememberNavController()
+    val languageViewModel: LanguageViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -47,7 +50,8 @@ fun MetroNavigation() {
             HomeScreen(
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
             )
         }
 
@@ -64,7 +68,8 @@ fun MetroNavigation() {
                 onStationClick = { stationId ->
                     navController.navigate(Screen.StationDetail.createRoute(stationId.toString()))
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                languageViewModel = languageViewModel
             )
         }
 
@@ -79,14 +84,20 @@ fun MetroNavigation() {
                 },
                 onNavigateToFavorites = {
                     navController.navigate(Screen.Favorites.route)
-                }
+                },
+                languageViewModel = languageViewModel
             )
         }
 
         // Favoritos
         composable(Screen.Favorites.route) {
             FavoritesScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
             )
         }
 
@@ -104,7 +115,8 @@ fun MetroNavigation() {
                 },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
-                onNavigateToAbout = { navController.navigate(Screen.About.route) }
+                onNavigateToAbout = { navController.navigate(Screen.About.route) },
+                languageViewModel = languageViewModel
             )
         }
 
@@ -119,7 +131,8 @@ fun MetroNavigation() {
                 },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
             )
         }
 
@@ -135,7 +148,8 @@ fun MetroNavigation() {
                 },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { /* Ya estamos en rutas */ },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
             )
         }
 

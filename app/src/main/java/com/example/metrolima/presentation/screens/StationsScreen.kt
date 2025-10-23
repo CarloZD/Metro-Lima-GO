@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.presentation.viewmodel.EstacionViewModel
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,10 +32,12 @@ fun StationsScreen(
     onNavigateToSettings: () -> Unit = {},
     onStationClick: (Int) -> Unit = {},
     onBack: () -> Unit = {},
-    viewModel: EstacionViewModel = viewModel()
+    viewModel: EstacionViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
     var selectedTab by remember { mutableStateOf(1) }
-    var selectedLine by remember { mutableStateOf("Todas") }
+    var selectedLine by remember { mutableStateOf(StringsManager.getString("all_lines", isEnglish)) }
     var showFilterMenu by remember { mutableStateOf(false) }
 
     // Observar datos desde Room
@@ -45,13 +49,13 @@ fun StationsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Estaciones", fontWeight = FontWeight.Bold)
+                    Text(StringsManager.getString("stations", isEnglish), fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = StringsManager.getString("back", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -61,7 +65,7 @@ fun StationsScreen(
                     IconButton(onClick = { showFilterMenu = true }) {
                         Icon(
                             Icons.Default.FilterList,
-                            contentDescription = "Filtrar por línea",
+                            contentDescription = StringsManager.getString("filter_by_line", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -72,15 +76,15 @@ fun StationsScreen(
                         onDismissRequest = { showFilterMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Todas las líneas") },
+                            text = { Text(StringsManager.getString("all_lines", isEnglish)) },
                             onClick = {
-                                selectedLine = "Todas"
+                                selectedLine = StringsManager.getString("all_lines", isEnglish)
                                 viewModel.searchEstaciones("")
                                 showFilterMenu = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Línea 1") },
+                            text = { Text(StringsManager.getString("line_1", isEnglish)) },
                             onClick = {
                                 selectedLine = "Línea 1"
                                 viewModel.getEstacionesByLinea("Línea 1")
@@ -88,7 +92,7 @@ fun StationsScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Línea 2") },
+                            text = { Text(StringsManager.getString("line_2", isEnglish)) },
                             onClick = {
                                 selectedLine = "Línea 2"
                                 viewModel.getEstacionesByLinea("Línea 2")
@@ -112,7 +116,7 @@ fun StationsScreen(
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    label = { Text("Home", fontSize = 10.sp) },
+                    label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
                     selected = selectedTab == 0,
                     onClick = {
                         selectedTab = 0
@@ -121,13 +125,13 @@ fun StationsScreen(
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Train, contentDescription = null) },
-                    label = { Text("Estaciones", fontSize = 10.sp) },
+                    label = { Text(StringsManager.getString("stations_nav", isEnglish), fontSize = 10.sp) },
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Map, contentDescription = null) },
-                    label = { Text("Rutas", fontSize = 10.sp) },
+                    label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
                     selected = selectedTab == 2,
                     onClick = {
                         selectedTab = 2
@@ -136,7 +140,7 @@ fun StationsScreen(
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    label = { Text("Configuración", fontSize = 10.sp) },
+                    label = { Text(StringsManager.getString("configuration_nav", isEnglish), fontSize = 10.sp) },
                     selected = selectedTab == 3,
                     onClick = {
                         selectedTab = 3
@@ -153,7 +157,7 @@ fun StationsScreen(
                 .padding(paddingValues)
         ) {
             // Chip de filtro activo
-            if (selectedLine != "Todas") {
+            if (selectedLine != StringsManager.getString("all_lines", isEnglish)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -163,10 +167,10 @@ fun StationsScreen(
                 ) {
                     AssistChip(
                         onClick = {
-                            selectedLine = "Todas"
+                            selectedLine = StringsManager.getString("all_lines", isEnglish)
                             viewModel.searchEstaciones("")
                         },
-                        label = { Text("Filtrando: $selectedLine", fontSize = 12.sp) },
+                        label = { Text("${StringsManager.getString("filtering", isEnglish)}: $selectedLine", fontSize = 12.sp) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.FilterList,
@@ -177,7 +181,7 @@ fun StationsScreen(
                         trailingIcon = {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Quitar filtro",
+                                contentDescription = StringsManager.getString("remove_filter", isEnglish),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -192,14 +196,14 @@ fun StationsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Buscar estación o distrito") },
+                placeholder = { Text(StringsManager.getString("search_station_district", isEnglish)) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.searchEstaciones("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Limpiar")
+                            Icon(Icons.Default.Clear, contentDescription = StringsManager.getString("clear", isEnglish))
                         }
                     }
                 },
@@ -209,7 +213,7 @@ fun StationsScreen(
 
             // Conteo de resultados
             Text(
-                "${estaciones.size} estaciones encontradas",
+                "${estaciones.size} ${StringsManager.getString("stations_found", isEnglish)}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -234,17 +238,17 @@ fun StationsScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                "No se encontraron estaciones",
+                                StringsManager.getString("no_stations_found", isEnglish),
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                             )
-                            if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
+                            if (selectedLine != StringsManager.getString("all_lines", isEnglish) || searchQuery.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 TextButton(onClick = {
-                                    selectedLine = "Todas"
+                                    selectedLine = StringsManager.getString("all_lines", isEnglish)
                                     viewModel.searchEstaciones("")
                                 }) {
-                                    Text("Limpiar filtros")
+                                    Text(StringsManager.getString("clear_filters", isEnglish))
                                 }
                             }
                         }

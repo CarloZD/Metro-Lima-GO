@@ -15,7 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.presentation.components.BottomNavigationBar
+import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.utils.StringsManager
 
 data class FavoriteRoute(
     val id: Int,
@@ -37,8 +40,10 @@ fun FavoritesScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
 
     var favoriteRoutes by remember {
@@ -68,7 +73,7 @@ fun FavoritesScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Favoritos",
+                        StringsManager.getString("favorites", isEnglish),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -77,7 +82,7 @@ fun FavoritesScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = StringsManager.getString("back", isEnglish),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -94,7 +99,8 @@ fun FavoritesScreen(
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
-                onNavigateToSettings = onNavigateToSettings
+                onNavigateToSettings = onNavigateToSettings,
+                isEnglish = isEnglish
             )
         }
     ) { padding ->
@@ -113,12 +119,12 @@ fun FavoritesScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Rutas", fontSize = 14.sp) }
+                    text = { Text(StringsManager.getString("routes", isEnglish), fontSize = 14.sp) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Estaciones", fontSize = 14.sp) }
+                    text = { Text(StringsManager.getString("stations", isEnglish), fontSize = 14.sp) }
                 )
             }
 
@@ -126,12 +132,14 @@ fun FavoritesScreen(
             when (selectedTab) {
                 0 -> FavoriteRoutesList(
                     favoriteRoutes = favoriteRoutes,
-                    onDelete = { id -> favoriteRoutes = favoriteRoutes.filter { it.id != id } }
+                    onDelete = { id -> favoriteRoutes = favoriteRoutes.filter { it.id != id } },
+                    isEnglish = isEnglish
                 )
 
                 1 -> FavoriteStationsList(
                     favoriteStations = favoriteStations,
-                    onDelete = { id -> favoriteStations = favoriteStations.filter { it.id != id } }
+                    onDelete = { id -> favoriteStations = favoriteStations.filter { it.id != id } },
+                    isEnglish = isEnglish
                 )
             }
         }
@@ -141,13 +149,14 @@ fun FavoritesScreen(
 @Composable
 private fun FavoriteRoutesList(
     favoriteRoutes: List<FavoriteRoute>,
-    onDelete: (Int) -> Unit
+    onDelete: (Int) -> Unit,
+    isEnglish: Boolean
 ) {
     if (favoriteRoutes.isEmpty()) {
         EmptyState(
             icon = Icons.Default.Star,
-            message = "No tienes rutas favoritas",
-            hint = "Guarda tus rutas frecuentes aquí"
+            message = StringsManager.getString("no_favorite_routes", isEnglish),
+            hint = StringsManager.getString("save_frequent_routes", isEnglish)
         )
     } else {
         LazyColumn(
@@ -156,7 +165,11 @@ private fun FavoriteRoutesList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteRoutes) { route ->
-                FavoriteRouteItem(route = route, onDelete = { onDelete(route.id) })
+                FavoriteRouteItem(
+                    route = route,
+                    onDelete = { onDelete(route.id) },
+                    isEnglish = isEnglish
+                )
             }
         }
     }
@@ -165,13 +178,14 @@ private fun FavoriteRoutesList(
 @Composable
 private fun FavoriteStationsList(
     favoriteStations: List<FavoriteStation>,
-    onDelete: (Int) -> Unit
+    onDelete: (Int) -> Unit,
+    isEnglish: Boolean
 ) {
     if (favoriteStations.isEmpty()) {
         EmptyState(
             icon = Icons.Default.Train,
-            message = "No tienes estaciones favoritas",
-            hint = "Guarda tus estaciones frecuentes aquí"
+            message = StringsManager.getString("no_favorite_stations", isEnglish),
+            hint = StringsManager.getString("save_frequent_stations", isEnglish)
         )
     } else {
         LazyColumn(
@@ -180,7 +194,11 @@ private fun FavoriteStationsList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteStations) { station ->
-                FavoriteStationItem(station = station, onDelete = { onDelete(station.id) })
+                FavoriteStationItem(
+                    station = station,
+                    onDelete = { onDelete(station.id) },
+                    isEnglish = isEnglish
+                )
             }
         }
     }
@@ -218,7 +236,7 @@ private fun EmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, me
 }
 
 @Composable
-private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit) {
+private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit, isEnglish: Boolean) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -256,17 +274,19 @@ private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(route.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                 }
+
             }
 
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Close, contentDescription = "Eliminar")
+                Icon(Icons.Default.Close, contentDescription = StringsManager.getString("delete", isEnglish))
             }
         }
     }
 }
 
+
 @Composable
-private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit) {
+private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit, isEnglish: Boolean) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -316,7 +336,7 @@ private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit) 
             }
 
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Close, contentDescription = "Eliminar")
+                Icon(Icons.Default.Close, contentDescription = StringsManager.getString("delete", isEnglish))
             }
         }
     }
