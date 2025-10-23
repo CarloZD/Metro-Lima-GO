@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
@@ -44,13 +44,15 @@ fun RouteDetailScreenWithButtons(
     val context = LocalContext.current
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         StringsManager.getString("route", isEnglish),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onBackground // 🔹 Título negro
                     )
                 },
                 navigationIcon = {
@@ -58,13 +60,13 @@ fun RouteDetailScreenWithButtons(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = StringsManager.getString("back", isEnglish),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onBackground // 🔹 Icono negro
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surface, // 🔹 Fondo claro
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
@@ -132,6 +134,7 @@ fun RouteDetailScreenWithButtons(
                 }
             }
 
+            // 🔹 Detalles del viaje
             Text(
                 StringsManager.getString("trip_details", isEnglish),
                 fontSize = 20.sp,
@@ -159,6 +162,7 @@ fun RouteDetailScreenWithButtons(
                 }
             }
 
+            // 🔹 Botones inferiores
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -177,7 +181,7 @@ fun RouteDetailScreenWithButtons(
                 }
 
                 Button(
-                    onClick = { /* Aquí puedes redirigir a Favoritos o guardar */ },
+                    onClick = { /* Aquí podrías redirigir a Favoritos */ },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
@@ -194,6 +198,8 @@ fun RouteDetailScreenWithButtons(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
         }
     }
 }

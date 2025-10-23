@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metrolima.presentation.viewmodel.EstacionViewModel
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
+import com.example.metrolima.presentation.components.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,21 +37,28 @@ fun StationsScreen(
     languageViewModel: LanguageViewModel = viewModel()
 ) {
     val isEnglish by languageViewModel.isEnglish.collectAsState()
-    var selectedTab by remember { mutableStateOf(1) }
     var selectedLine by remember { mutableStateOf(StringsManager.getString("all_lines", isEnglish)) }
     var showFilterMenu by remember { mutableStateOf(false) }
 
-    // Observar datos desde Room
     val estaciones by viewModel.estaciones.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(StringsManager.getString("stations", isEnglish), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = StringsManager.getString("stations", isEnglish)
+                            .lowercase()
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 },
+
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -61,7 +69,6 @@ fun StationsScreen(
                     }
                 },
                 actions = {
-                    // 🔽 Botón de filtro
                     IconButton(onClick = { showFilterMenu = true }) {
                         Icon(
                             Icons.Default.FilterList,
@@ -70,93 +77,56 @@ fun StationsScreen(
                         )
                     }
 
-                    // Menú desplegable de líneas
                     DropdownMenu(
                         expanded = showFilterMenu,
                         onDismissRequest = { showFilterMenu = false }
                     ) {
-                        DropdownMenuItem(
-                            text = { Text(StringsManager.getString("all_lines", isEnglish)) },
-                            onClick = {
-                                selectedLine = StringsManager.getString("all_lines", isEnglish)
-                                viewModel.searchEstaciones("")
-                                showFilterMenu = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(StringsManager.getString("line_1", isEnglish)) },
-                            onClick = {
-                                selectedLine = "Línea 1"
-                                viewModel.getEstacionesByLinea("Línea 1")
-                                showFilterMenu = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(StringsManager.getString("line_2", isEnglish)) },
-                            onClick = {
-                                selectedLine = "Línea 2"
-                                viewModel.getEstacionesByLinea("Línea 2")
-                                showFilterMenu = false
-                            }
-                        )
+                        listOf(
+                            StringsManager.getString("all_lines", isEnglish),
+                            "Línea 1",
+                            "Línea 2"
+                        ).forEach { line ->
+                            DropdownMenuItem(
+                                text = { Text(line) },
+                                onClick = {
+                                    selectedLine = line
+                                    if (line == StringsManager.getString("all_lines", isEnglish)) {
+                                        viewModel.searchEstaciones("")
+                                    } else {
+                                        viewModel.getEstacionesByLinea(line)
+                                    }
+                                    showFilterMenu = false
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary, // ✅ Azul igual que StationDetailScreen
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
-
-        // Barra inferior de navegación
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
-                    selected = selectedTab == 0,
-                    onClick = {
-                        selectedTab = 0
-                        onNavigateToHome()
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Train, contentDescription = null) },
-                    label = { Text(StringsManager.getString("stations_nav", isEnglish), fontSize = 10.sp) },
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
-                    label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
-                    selected = selectedTab == 2,
-                    onClick = {
-                        selectedTab = 2
-                        onNavigateToRoutes()
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    label = { Text(StringsManager.getString("configuration_nav", isEnglish), fontSize = 10.sp) },
-                    selected = selectedTab == 3,
-                    onClick = {
-                        selectedTab = 3
-                        onNavigateToSettings()
-                    }
-                )
-            }
+            BottomNavigationBar(
+                selectedItem = 1,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToStations = {},
+                onNavigateToRoutes = onNavigateToRoutes,
+                onNavigateToSettings = onNavigateToSettings,
+                isEnglish = isEnglish
+            )
         }
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
+                .padding(padding)
         ) {
-            // Chip de filtro activo
+            // 🔹 Filtro activo
             if (selectedLine != StringsManager.getString("all_lines", isEnglish)) {
                 Row(
                     modifier = Modifier
@@ -170,26 +140,23 @@ fun StationsScreen(
                             selectedLine = StringsManager.getString("all_lines", isEnglish)
                             viewModel.searchEstaciones("")
                         },
-                        label = { Text("${StringsManager.getString("filtering", isEnglish)}: $selectedLine", fontSize = 12.sp) },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.FilterList,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                        label = {
+                            Text(
+                                "${StringsManager.getString("filtering", isEnglish)}: $selectedLine",
+                                fontSize = 12.sp
                             )
                         },
+                        leadingIcon = {
+                            Icon(Icons.Default.FilterList, null, Modifier.size(16.dp))
+                        },
                         trailingIcon = {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = StringsManager.getString("remove_filter", isEnglish),
-                                modifier = Modifier.size(16.dp)
-                            )
+                            Icon(Icons.Default.Close, null, Modifier.size(16.dp))
                         }
                     )
                 }
             }
 
-            // Barra de búsqueda
+            // 🔍 Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { viewModel.searchEstaciones(it) },
@@ -197,13 +164,11 @@ fun StationsScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 placeholder = { Text(StringsManager.getString("search_station_district", isEnglish)) },
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null)
-                },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.searchEstaciones("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = StringsManager.getString("clear", isEnglish))
+                            Icon(Icons.Default.Clear, contentDescription = null)
                         }
                     }
                 },
@@ -211,7 +176,6 @@ fun StationsScreen(
                 singleLine = true
             )
 
-            // Conteo de resultados
             Text(
                 "${estaciones.size} ${StringsManager.getString("stations_found", isEnglish)}",
                 fontSize = 12.sp,
@@ -219,7 +183,7 @@ fun StationsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            // Mostrar lista o estados vacíos
+            // 🔹 Contenido principal
             when {
                 isLoading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -242,7 +206,9 @@ fun StationsScreen(
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                             )
-                            if (selectedLine != StringsManager.getString("all_lines", isEnglish) || searchQuery.isNotEmpty()) {
+                            if (selectedLine != StringsManager.getString("all_lines", isEnglish)
+                                || searchQuery.isNotEmpty()
+                            ) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 TextButton(onClick = {
                                     selectedLine = StringsManager.getString("all_lines", isEnglish)
@@ -256,7 +222,14 @@ fun StationsScreen(
                 }
 
                 else -> {
-                    LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 80.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         items(estaciones) { estacion ->
                             StationItem(
                                 id = estacion.id,
@@ -274,9 +247,8 @@ fun StationsScreen(
     }
 }
 
-// ---- Tarjeta individual de estación ----
 @Composable
-fun StationItem(
+private fun StationItem(
     id: Int,
     name: String,
     line: String,
@@ -287,12 +259,15 @@ fun StationItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (imageRes != 0) {
                 Image(
                     painter = painterResource(imageRes),
@@ -314,7 +289,7 @@ fun StationItem(
                         imageVector = Icons.Default.Train,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -328,6 +303,7 @@ fun StationItem(
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(
                         color = MaterialTheme.colorScheme.primary,

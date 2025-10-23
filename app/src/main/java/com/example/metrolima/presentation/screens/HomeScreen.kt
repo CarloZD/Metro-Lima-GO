@@ -1,6 +1,5 @@
 package com.example.metrolima.presentation.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
 
@@ -33,6 +32,7 @@ fun HomeScreen(
     languageViewModel: LanguageViewModel = viewModel()
 ) {
     val isEnglish by languageViewModel.isEnglish.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -40,17 +40,19 @@ fun HomeScreen(
                     Text(
                         StringsManager.getString("metro_lima", isEnglish),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
         bottomBar = {
             BottomNavigationBar(
+                selectedItem = 0,
+                onNavigateToHome = {},
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
                 onNavigateToSettings = onNavigateToSettings,
@@ -65,7 +67,7 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo Section
+            // 🔹 Logo Section
             item {
                 Box(
                     modifier = Modifier
@@ -74,9 +76,7 @@ fun HomeScreen(
                         .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Box(
                             modifier = Modifier
                                 .size(120.dp)
@@ -108,20 +108,16 @@ fun HomeScreen(
                 }
             }
 
-            // Search Section
+            // 🔹 Search Section
             item {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         SearchField(
                             icon = Icons.Default.LocationOn,
                             hint = StringsManager.getString("where_to_go", isEnglish),
@@ -131,23 +127,15 @@ fun HomeScreen(
                         SearchField(
                             icon = Icons.Default.MyLocation,
                             hint = StringsManager.getString("your_location", isEnglish),
-                            onClick = { /* Handle location */ }
+                            onClick = { /* Acciones futuras */ }
                         )
                     }
                 }
             }
 
-            // Quick Access Section
+            // 🔹 Quick Access Section
             item {
-                Text(
-                    StringsManager.getString("quick_access", isEnglish),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                SectionTitle(StringsManager.getString("quick_access", isEnglish))
             }
 
             item {
@@ -174,20 +162,11 @@ fun HomeScreen(
                 }
             }
 
-            // Stations List Section
+            // 🔹 Stations Section
             item {
-                Text(
-                    StringsManager.getString("stations", isEnglish),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp)
-                )
+                SectionTitle(StringsManager.getString("stations", isEnglish))
             }
 
-            // Station Items
             items(getRecentStations(isEnglish)) { station ->
                 StationListItem(
                     stationName = station,
@@ -196,6 +175,23 @@ fun HomeScreen(
             }
         }
     }
+}
+
+// -------------------------------
+// COMPONENTES REUTILIZABLES
+// -------------------------------
+
+@Composable
+fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
 }
 
 @Composable
@@ -210,12 +206,7 @@ fun SearchField(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        placeholder = {
-            Text(
-                hint,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
-        },
+        placeholder = { Text(hint, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) },
         leadingIcon = {
             Icon(
                 imageVector = icon,
@@ -244,9 +235,7 @@ fun QuickAccessCard(
         modifier = modifier
             .height(100.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(
@@ -290,9 +279,7 @@ fun StationListItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Row(
@@ -323,56 +310,9 @@ fun StationListItem(
     }
 }
 
-@Composable
-fun BottomNavigationBar(
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    onNavigateToSettings: () -> Unit,
-    isEnglish: Boolean
-) {
-    var selectedItem by remember { mutableStateOf(0) }
-
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary
-    ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = StringsManager.getString("home", isEnglish)) },
-            label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
-            selected = selectedItem == 0,
-            onClick = { selectedItem = 0 }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = StringsManager.getString("stations_nav", isEnglish)) },
-            label = { Text(StringsManager.getString("stations_nav", isEnglish), fontSize = 10.sp) },
-            selected = selectedItem == 1,
-            onClick = {
-                selectedItem = 1
-                onNavigateToStations()
-            }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = StringsManager.getString("routes", isEnglish)) },
-            label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
-            selected = selectedItem == 2,
-            onClick = {
-                selectedItem = 2
-                onNavigateToRoutes()
-            }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text(StringsManager.getString("configuration_nav", isEnglish), fontSize = 10.sp) },
-            selected = selectedItem == 3,
-            onClick = {
-                selectedItem = 3
-                onNavigateToSettings()
-            }
-        )
-    }
-}
-
-// Mock data
+// -------------------------------
+// MOCK DATA
+// -------------------------------
 fun getRecentStations(isEnglish: Boolean = false): List<String> {
     return listOf(
         StringsManager.getString("central_station", isEnglish),

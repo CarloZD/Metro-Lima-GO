@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,9 +41,7 @@ fun RouteSelectionScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val isEnglish by languageViewModel.isEnglish.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadEstacionesRemotas()
-    }
+    LaunchedEffect(Unit) { viewModel.loadEstacionesRemotas() }
 
     var origen by remember { mutableStateOf<Estacion?>(null) }
     var destino by remember { mutableStateOf<Estacion?>(null) }
@@ -52,24 +49,32 @@ fun RouteSelectionScreen(
     var estacionesIntermedias by remember { mutableStateOf(0) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = StringsManager.getString("route", isEnglish),
-                        color = Color.White,
+                        text = StringsManager.getString("route", isEnglish)
+                            .lowercase()
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+                        fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = StringsManager.getString("back", isEnglish))
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = StringsManager.getString("back", isEnglish),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary, // Igual que StationsScreen
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -85,7 +90,12 @@ fun RouteSelectionScreen(
         }
     ) { padding ->
         if (isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         } else {
@@ -95,10 +105,11 @@ fun RouteSelectionScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
+                    .imePadding(),
+                verticalArrangement = Arrangement.Top
             ) {
-                // 🔹 Mapa placeholder (imagen superior)
                 Image(
-                    painter = painterResource(id = R.drawable.mapa_lima), // usa una imagen local o placeholder
+                    painter = painterResource(id = R.drawable.mapa_lima),
                     contentDescription = "Mapa de la ruta",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -107,42 +118,49 @@ fun RouteSelectionScreen(
                     contentScale = ContentScale.Crop
                 )
 
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = StringsManager.getString("trip_details", isEnglish),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // 🔹 Origen
+                Text(
+                    text = StringsManager.getString("trip_details", isEnglish),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     InfoCard(
                         icon = Icons.Default.LocationOn,
                         title = StringsManager.getString("origin", isEnglish),
                         value = origen?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
-
-                    // 🔹 Destino
                     InfoCard(
                         icon = Icons.Default.Place,
                         title = StringsManager.getString("destination", isEnglish),
                         value = destino?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
 
-                    // 🔹 Dropdowns
-                    EstacionDropdown(StringsManager.getString("select_origin", isEnglish), estaciones) { origen = it }
-                    EstacionDropdown(StringsManager.getString("select_destination", isEnglish), estaciones) { destino = it }
+                    EstacionDropdown(
+                        label = StringsManager.getString("select_origin", isEnglish),
+                        estaciones = estaciones
+                    ) { origen = it }
 
-                    // 🔹 Calcular ruta
+                    EstacionDropdown(
+                        label = StringsManager.getString("select_destination", isEnglish),
+                        estaciones = estaciones
+                    ) { destino = it }
+
                     Button(
                         onClick = {
                             if (origen != null && destino != null) {
                                 val tiempo = (15..45).random()
                                 val intermedias = (5..20).random()
-                                tiempoEstimado = "$tiempo minutos"
+                                tiempoEstimado = "$tiempo min"
                                 estacionesIntermedias = intermedias
                             }
                         },
@@ -152,12 +170,11 @@ fun RouteSelectionScreen(
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.DirectionsTransit, null)
+                        Icon(Icons.Default.DirectionsTransit, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(StringsManager.getString("calculate_route", isEnglish))
                     }
 
-                    // 🔹 Resultado
                     if (tiempoEstimado != null) {
                         InfoCard(
                             icon = Icons.Default.Schedule,
@@ -169,29 +186,21 @@ fun RouteSelectionScreen(
                             title = StringsManager.getString("intermediate_stations", isEnglish),
                             value = estacionesIntermedias.toString()
                         )
-
-                        Spacer(Modifier.height(12.dp))
-                        Button(
-                            onClick = {},
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF1976D2)
-                            ),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        ) {
-                            Text(StringsManager.getString("save_route", isEnglish), color = Color.White, fontWeight = FontWeight.Bold)
-                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             }
         }
     }
 }
 
 @Composable
-fun InfoCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, value: String) {
+fun InfoCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    value: String
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
@@ -201,7 +210,7 @@ fun InfoCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: Strin
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
             Spacer(Modifier.width(12.dp))
             Column {
                 Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
@@ -225,7 +234,7 @@ fun EstacionDropdown(label: String, estaciones: List<Estacion>, onSelect: (Estac
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.ArrowDropDown, null)
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                 }
             }
         )

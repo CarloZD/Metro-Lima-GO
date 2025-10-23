@@ -18,6 +18,7 @@ import com.example.metrolima.data.model.ThemeMode
 import com.example.metrolima.presentation.viewmodel.ThemeViewModel
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
+import com.example.metrolima.presentation.components.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,19 +31,19 @@ fun SettingsScreen(
     themeViewModel: ThemeViewModel = viewModel(),
     languageViewModel: LanguageViewModel = viewModel()
 ) {
-    // Observar el modo de tema actual
     val currentThemeMode by themeViewModel.themeMode.collectAsState()
-    // Observar el idioma actual
     val isEnglish by languageViewModel.isEnglish.collectAsState()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         StringsManager.getString("configuration", isEnglish),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 navigationIcon = {
@@ -55,49 +56,33 @@ fun SettingsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
         bottomBar = {
-            SettingsBottomBar(
+            BottomNavigationBar(
+                selectedItem = 3,
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
+                onNavigateToSettings = {},
                 isEnglish = isEnglish
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
+                .padding(paddingValues)
+                .padding(vertical = 8.dp)
         ) {
-            // Tema Section
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
+            // 🔹 Tema Section
+            SettingSection(
+                title = StringsManager.getString("theme", isEnglish),
+                description = StringsManager.getString("change_theme_description", isEnglish)
             ) {
-                Text(
-                    StringsManager.getString("theme", isEnglish),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    StringsManager.getString("change_theme_description", isEnglish),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -116,7 +101,7 @@ fun SettingsScreen(
                                 if (isDark) ThemeMode.DARK else ThemeMode.LIGHT
                             )
                         },
-                        modifier = Modifier.scale(0.85f)
+                        modifier = Modifier.scale(0.9f)
                     )
 
                     Text(
@@ -126,18 +111,13 @@ fun SettingsScreen(
                     )
                 }
 
-                // Botón para volver al tema del sistema
                 if (currentThemeMode != ThemeMode.SYSTEM) {
                     Spacer(modifier = Modifier.height(8.dp))
                     TextButton(
                         onClick = { themeViewModel.setThemeMode(ThemeMode.SYSTEM) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             StringsManager.getString("use_system_theme", isEnglish),
@@ -147,47 +127,24 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-            // Idioma Section
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
+            // 🌐 Idioma Section
+            SettingSection(
+                title = StringsManager.getString("language", isEnglish),
+                description = StringsManager.getString("select_language_description", isEnglish)
             ) {
-                Text(
-                    StringsManager.getString("language", isEnglish),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    StringsManager.getString("select_language_description", isEnglish),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Español",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
+                    Text("Español", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
                     Switch(
                         checked = isEnglish,
                         onCheckedChange = { languageViewModel.setLanguage(it) },
-                        modifier = Modifier.scale(0.85f)
+                        modifier = Modifier.scale(0.9f)
                     )
-
                     Text(
                         StringsManager.getString("english", isEnglish),
                         fontSize = 13.sp,
@@ -196,102 +153,102 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(1.dp))
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-            // Acerca de Item
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .clickable { onNavigateToAbout() }
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        StringsManager.getString("about", isEnglish),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            // ℹ️ Acerca de
+            SettingItem(
+                icon = Icons.Default.Info,
+                title = StringsManager.getString("about", isEnglish),
+                onClick = onNavigateToAbout
+            )
 
-            Spacer(modifier = Modifier.height(1.dp))
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-            // Versión Item
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    StringsManager.getString("version", isEnglish),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    "1.0.0",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
+            // 🧩 Versión
+            SettingItem(
+                icon = Icons.Default.Info,
+                title = StringsManager.getString("version", isEnglish),
+                value = "1.0.0"
+            )
+
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
         }
     }
 }
 
 @Composable
-private fun SettingsBottomBar(
-    onNavigateToHome: () -> Unit,
-    onNavigateToStations: () -> Unit,
-    onNavigateToRoutes: () -> Unit,
-    isEnglish: Boolean
+private fun SettingSection(
+    title: String,
+    description: String,
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.primary
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = StringsManager.getString("home", isEnglish)) },
-            label = { Text(StringsManager.getString("home", isEnglish), fontSize = 10.sp) },
-            selected = false,
-            onClick = onNavigateToHome
+        Text(
+            title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Train, contentDescription = StringsManager.getString("stations", isEnglish)) },
-            label = { Text(StringsManager.getString("stations", isEnglish), fontSize = 10.sp) },
-            selected = false,
-            onClick = onNavigateToStations
+        Text(
+            description,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = StringsManager.getString("routes", isEnglish)) },
-            label = { Text(StringsManager.getString("routes", isEnglish), fontSize = 10.sp) },
-            selected = false,
-            onClick = onNavigateToRoutes
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Configuración") },
-            label = { Text(StringsManager.getString("configuration", isEnglish), fontSize = 10.sp) },
-            selected = true,
-            onClick = { }
-        )
+        content()
+    }
+}
+
+@Composable
+private fun SettingItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    value: String? = null,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                title,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        if (value != null) {
+            Text(
+                value,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        } else {
+            Icon(
+                Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

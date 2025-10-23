@@ -20,6 +20,9 @@ import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
 
+// ----------------------
+// DATA CLASSES
+// ----------------------
 data class FavoriteRoute(
     val id: Int,
     val name: String,
@@ -33,6 +36,9 @@ data class FavoriteStation(
     val district: String
 )
 
+// ----------------------
+// MAIN SCREEN
+// ----------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
@@ -75,7 +81,8 @@ fun FavoritesScreen(
                     Text(
                         StringsManager.getString("favorites", isEnglish),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 },
                 navigationIcon = {
@@ -88,14 +95,13 @@ fun FavoritesScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = 2, // resalta el ítem "Rutas"
+                selectedItem = 2, // Rutas
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
@@ -110,7 +116,7 @@ fun FavoritesScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
-            // Tabs
+            // Tabs superiores
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -128,7 +134,7 @@ fun FavoritesScreen(
                 )
             }
 
-            // Contenido según pestaña seleccionada
+            // Contenido de cada pestaña
             when (selectedTab) {
                 0 -> FavoriteRoutesList(
                     favoriteRoutes = favoriteRoutes,
@@ -145,6 +151,10 @@ fun FavoritesScreen(
         }
     }
 }
+
+// ----------------------
+// LISTAS Y ELEMENTOS
+// ----------------------
 
 @Composable
 private fun FavoriteRoutesList(
@@ -165,11 +175,7 @@ private fun FavoriteRoutesList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteRoutes) { route ->
-                FavoriteRouteItem(
-                    route = route,
-                    onDelete = { onDelete(route.id) },
-                    isEnglish = isEnglish
-                )
+                FavoriteRouteItem(route, onDelete = { onDelete(route.id) }, isEnglish = isEnglish)
             }
         }
     }
@@ -194,11 +200,7 @@ private fun FavoriteStationsList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteStations) { station ->
-                FavoriteStationItem(
-                    station = station,
-                    onDelete = { onDelete(station.id) },
-                    isEnglish = isEnglish
-                )
+                FavoriteStationItem(station, onDelete = { onDelete(station.id) }, isEnglish = isEnglish)
             }
         }
     }
@@ -224,12 +226,12 @@ private fun EmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, me
                 message,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Text(
                 hint,
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
         }
     }
@@ -258,15 +260,10 @@ private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit, isEngl
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(Color(0xFFFFF9C4), shape = RoundedCornerShape(12.dp)),
+                        .background(Color(0xFFFFF9C4), RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(28.dp)
-                    )
+                    Icon(Icons.Default.Star, null, tint = Color(0xFFFFC107), modifier = Modifier.size(28.dp))
                 }
 
                 Column {
@@ -274,7 +271,6 @@ private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit, isEngl
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(route.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
                 }
-
             }
 
             IconButton(onClick = onDelete) {
@@ -283,7 +279,6 @@ private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit, isEngl
         }
     }
 }
-
 
 @Composable
 private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit, isEnglish: Boolean) {
@@ -308,10 +303,7 @@ private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit, 
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
+                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
