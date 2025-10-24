@@ -1,5 +1,6 @@
 package com.example.metrolima.presentation.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,10 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metrolima.R
 import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.utils.StringsManager
@@ -67,7 +71,6 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🔹 Logo Section
             item {
                 Box(
                     modifier = Modifier
@@ -77,33 +80,17 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "MetroLima GO Logo",
                             modifier = Modifier
-                                .size(120.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color(0xFF1E3A5F)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "M",
-                                fontSize = 64.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF00BCD4)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "METROLIMA",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E3A5F)
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Fit
                         )
-                        Text(
-                            "GO",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF00BCD4)
-                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
                     }
                 }
             }
