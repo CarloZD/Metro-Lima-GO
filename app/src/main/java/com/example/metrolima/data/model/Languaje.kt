@@ -23,7 +23,7 @@ enum class Language(
             return when (systemLanguage) {
                 "en" -> ENGLISH
                 "es" -> SPANISH
-                else -> SPANISH // Español como idioma por defecto
+                else -> SPANISH
             }
         }
     }
