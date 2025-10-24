@@ -103,6 +103,9 @@ El objetivo principal es brindar una **experiencia rápida, visual y moderna** p
 
 ---
 
+## Video de demostración
+https://drive.google.com/file/d/1MfL9WCBeDw-_1y_nlasjOsEW9B5YeLqv/view?usp=sharing
+
 ## 🧾 Docente
 
 **JUAN LEON S.**
