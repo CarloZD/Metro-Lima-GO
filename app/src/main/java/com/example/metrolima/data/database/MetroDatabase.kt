@@ -7,19 +7,22 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.metrolima.R
 import com.example.metrolima.data.dao.EstacionDao
+import com.example.metrolima.data.dao.LineaDao
 import com.example.metrolima.data.model.Estacion
+import com.example.metrolima.data.model.Linea
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Estacion::class],
-    version = 2,
+    entities = [Estacion::class, Linea::class],
+    version = 3, // ⚠️ Incrementa la versión
     exportSchema = false
 )
 abstract class MetroDatabase : RoomDatabase() {
 
     abstract fun estacionDao(): EstacionDao
+    abstract fun lineaDao(): LineaDao
 
     companion object {
         @Volatile
@@ -32,6 +35,7 @@ abstract class MetroDatabase : RoomDatabase() {
                     MetroDatabase::class.java,
                     "metro_database"
                 )
+                    .fallbackToDestructiveMigration() // ⚠️ Temporal para desarrollo
                     .addCallback(DatabaseCallback(context))
                     .build()
                 INSTANCE = instance
@@ -46,14 +50,83 @@ abstract class MetroDatabase : RoomDatabase() {
                 super.onCreate(db)
                 INSTANCE?.let { database ->
                     CoroutineScope(Dispatchers.IO).launch {
-                        populateDatabase(database.estacionDao())
+                        populateDatabase(
+                            database.estacionDao(),
+                            database.lineaDao()
+                        )
                     }
                 }
             }
 
-            suspend fun populateDatabase(estacionDao: EstacionDao) {
+            suspend fun populateDatabase(
+                estacionDao: EstacionDao,
+                lineaDao: LineaDao
+            ) {
+                // Limpiar todo
                 estacionDao.deleteAllEstaciones()
+                lineaDao.deleteAllLineas()
 
+                // ==================== LÍNEAS ====================
+                val lineas = listOf(
+                    Linea(
+                        nombre = "Línea 1",
+                        numero = 1,
+                        colorHex = "#4CAF50", // Verde
+                        estado = "Operativa",
+                        descripcion = "Villa El Salvador - San Juan de Lurigancho",
+                        estacionInicio = "Villa El Salvador",
+                        estacionFin = "Bayóvar"
+                    ),
+                    Linea(
+                        nombre = "Línea 2",
+                        numero = 2,
+                        colorHex = "#FFC107", // Amarillo
+                        estado = "En construcción",
+                        descripcion = "Ate - Callao",
+                        estacionInicio = "Ate",
+                        estacionFin = "Guardia Chalaca"
+                    ),
+                    Linea(
+                        nombre = "Línea 3",
+                        numero = 3,
+                        colorHex = "#00BCD4", // Celeste
+                        estado = "Planificada",
+                        descripcion = "Comas - San Juan de Miraflores",
+                        estacionInicio = "Comas",
+                        estacionFin = "Angamos"
+                    ),
+                    Linea(
+                        nombre = "Línea 4",
+                        numero = 4,
+                        colorHex = "#F44336", // Rojo
+                        estado = "Planificada",
+                        descripcion = "Aeropuerto - San Miguel",
+                        estacionInicio = "Aeropuerto Jorge Chávez",
+                        estacionFin = "La Marina"
+                    ),
+                    Linea(
+                        nombre = "Línea 5",
+                        numero = 5,
+                        colorHex = "#E91E63", // Rosa
+                        estado = "Planificada",
+                        descripcion = "Miraflores - Chorrillos",
+                        estacionInicio = "Benavides",
+                        estacionFin = "Miguel Grau"
+                    ),
+                    Linea(
+                        nombre = "Línea 6",
+                        numero = 6,
+                        colorHex = "#9C27B0", // Morado
+                        estado = "Planificada",
+                        descripcion = "Independencia - San Borja",
+                        estacionInicio = "Túpac Amaru",
+                        estacionFin = "Primavera"
+                    )
+                )
+
+                lineaDao.insertAllLineas(lineas)
+
+                // ==================== TODAS TUS ESTACIONES ORIGINALES ====================
                 val estaciones = listOf(
                     // -------------------- LÍNEA 1 (Verde) --------------------
                     Estacion(
@@ -268,11 +341,8 @@ abstract class MetroDatabase : RoomDatabase() {
                     )
                 )
 
-
-
                 estacionDao.insertAllEstaciones(estaciones)
             }
-
         }
     }
 }

@@ -328,6 +328,34 @@ object StringsManager {
         "back" to mapOf(
             "es" to "Volver",
             "en" to "Back"
+        ),
+        "lines" to mapOf(
+            "es" to "Líneas",
+            "en" to "Lines"
+        ),
+        "line_detail" to mapOf(
+            "es" to "Detalle de Línea",
+            "en" to "Line Detail"
+        ),
+        "operational" to mapOf(
+            "es" to "Operativa",
+            "en" to "Operational"
+        ),
+        "under_construction" to mapOf(
+            "es" to "En construcción",
+            "en" to "Under construction"
+        ),
+        "planned" to mapOf(
+            "es" to "Planificada",
+            "en" to "Planned"
+        ),
+        "show_map" to mapOf(
+            "es" to "Ver mapa",
+            "en" to "Show map"
+        ),
+        "view_stations" to mapOf(
+            "es" to "Ver estaciones",
+            "en" to "View stations"
         )
     )
 

@@ -31,6 +31,10 @@ sealed class Screen(val route: String) {
     object StationDetail : Screen("station_detail/{stationId}") {
         fun createRoute(stationId: String) = "station_detail/$stationId"
     }
+    object Lines : Screen("lines")
+    object LineDetail : Screen("line_detail/{lineId}") {
+        fun createRoute(lineId: Int) = "line_detail/$lineId"
+    }
 }
 
 /* ---------------------------
@@ -51,7 +55,19 @@ fun MetroNavigation() {
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToLines = { navController.navigate(Screen.Lines.route) },
                 languageViewModel = languageViewModel
+            )
+        }
+        composable(Screen.LineDetail.route) { backStackEntry ->
+            val lineId = backStackEntry.arguments?.getString("lineId")?.toIntOrNull() ?: 1
+            LineDetailScreen(
+                lineId = lineId,
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
             )
         }
 

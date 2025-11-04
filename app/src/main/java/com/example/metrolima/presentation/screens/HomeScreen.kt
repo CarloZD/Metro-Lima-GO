@@ -33,6 +33,7 @@ fun HomeScreen(
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToLines: ()-> Unit = {},
     languageViewModel: LanguageViewModel = viewModel()
 ) {
     val isEnglish by languageViewModel.isEnglish.collectAsState()
@@ -130,7 +131,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Espaciado más pequeño
                 ) {
                     QuickAccessCard(
                         icon = Icons.Default.Schedule,
@@ -139,15 +140,22 @@ fun HomeScreen(
                         onClick = { onNavigateToStations() }
                     )
                     QuickAccessCard(
+                        icon = Icons.Default.Train,
+                        title = if (isEnglish) "Lines" else "Líneas",
+                        iconColor = Color(0xFF9C27B0),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToLines() }
+                    )
+                    QuickAccessCard(
                         icon = Icons.Default.Route,
                         title = StringsManager.getString("your_routes", isEnglish),
-                        subtitle = StringsManager.getString("saved_routes", isEnglish),
                         iconColor = Color(0xFF4CAF50),
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToRoutes() }
                     )
                 }
             }
+
 
             // 🔹 Stations Section
             item {
