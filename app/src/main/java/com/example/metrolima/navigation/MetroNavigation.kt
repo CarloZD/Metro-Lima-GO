@@ -25,13 +25,13 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Favorites : Screen("favorites")
     object About : Screen("about")
+    object Lines : Screen("lines")  // ✅ AGREGADO
     object RouteDetail : Screen("route_detail/{origin}/{destination}") {
         fun createRoute(origin: String, destination: String) = "route_detail/$origin/$destination"
     }
     object StationDetail : Screen("station_detail/{stationId}") {
         fun createRoute(stationId: String) = "station_detail/$stationId"
     }
-    object Lines : Screen("lines")
     object LineDetail : Screen("line_detail/{lineId}") {
         fun createRoute(lineId: Int) = "line_detail/$lineId"
     }
@@ -55,10 +55,31 @@ fun MetroNavigation() {
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToLines = { navController.navigate(Screen.Lines.route) },
+                onNavigateToLines = { navController.navigate(Screen.Lines.route) },  // ✅ CONECTADO
                 languageViewModel = languageViewModel
             )
         }
+
+        // ✅ NUEVA RUTA: Lista de Líneas
+        composable(Screen.Lines.route) {
+            LinesScreen(
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onLineClick = { lineId ->
+                    navController.navigate(Screen.LineDetail.createRoute(lineId))
+                },
+                onBack = { navController.popBackStack() },
+                languageViewModel = languageViewModel
+            )
+        }
+
+        // Detalle de Línea
         composable(Screen.LineDetail.route) { backStackEntry ->
             val lineId = backStackEntry.arguments?.getString("lineId")?.toIntOrNull() ?: 1
             LineDetailScreen(
@@ -71,7 +92,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Lista de estaciones - USA ROOM
+        // Lista de estaciones
         composable(Screen.Stations.route) {
             StationsScreen(
                 onNavigateToHome = {
@@ -89,7 +110,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Detalle de estación - USA ROOM
+        // Detalle de estación
         composable(Screen.StationDetail.route) { backStackEntry ->
             val stationId = backStackEntry.arguments?.getString("stationId")?.toIntOrNull() ?: 1
             StationDetailScreen(
@@ -116,9 +137,6 @@ fun MetroNavigation() {
                 languageViewModel = languageViewModel
             )
         }
-
-        // Detalle de ruta
-
 
         // Configuración
         composable(Screen.Settings.route) {
@@ -152,7 +170,6 @@ fun MetroNavigation() {
             )
         }
 
-
         // Rutas - Pantalla de selección de rutas
         composable(Screen.Routes.route) {
             RouteSelectionScreen(
@@ -168,7 +185,6 @@ fun MetroNavigation() {
                 languageViewModel = languageViewModel
             )
         }
-
     }
 }
 
