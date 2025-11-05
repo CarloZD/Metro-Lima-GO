@@ -1,6 +1,7 @@
 package com.example.metrolima.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,6 +44,8 @@ data class FavoriteStation(
 @Composable
 fun FavoritesScreen(
     onBack: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
+    onNavigateToRouteDetail: (String, String) -> Unit,
     onNavigateToHome: () -> Unit = {},
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
@@ -101,7 +104,7 @@ fun FavoritesScreen(
         },
         bottomBar = {
             BottomNavigationBar(
-                selectedItem = 2, // Rutas
+                selectedItem = 2,
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToStations = onNavigateToStations,
                 onNavigateToRoutes = onNavigateToRoutes,
@@ -116,7 +119,7 @@ fun FavoritesScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
-            // Tabs superiores
+            // Tabs
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -125,25 +128,25 @@ fun FavoritesScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text(StringsManager.getString("routes", isEnglish), fontSize = 14.sp) }
+                    text = { Text(StringsManager.getString("routes", isEnglish)) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text(StringsManager.getString("stations", isEnglish), fontSize = 14.sp) }
+                    text = { Text(StringsManager.getString("stations", isEnglish)) }
                 )
             }
 
-            // Contenido de cada pestaña
             when (selectedTab) {
                 0 -> FavoriteRoutesList(
                     favoriteRoutes = favoriteRoutes,
+                    onClick = { origin, destination -> onNavigateToRouteDetail(origin, destination) },
                     onDelete = { id -> favoriteRoutes = favoriteRoutes.filter { it.id != id } },
                     isEnglish = isEnglish
                 )
-
                 1 -> FavoriteStationsList(
                     favoriteStations = favoriteStations,
+                    onClick = { id -> onNavigateToDetail(id) },
                     onDelete = { id -> favoriteStations = favoriteStations.filter { it.id != id } },
                     isEnglish = isEnglish
                 )
@@ -153,12 +156,12 @@ fun FavoritesScreen(
 }
 
 // ----------------------
-// LISTAS Y ELEMENTOS
+// LISTAS
 // ----------------------
-
 @Composable
 private fun FavoriteRoutesList(
     favoriteRoutes: List<FavoriteRoute>,
+    onClick: (String, String) -> Unit,
     onDelete: (Int) -> Unit,
     isEnglish: Boolean
 ) {
@@ -175,7 +178,13 @@ private fun FavoriteRoutesList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteRoutes) { route ->
-                FavoriteRouteItem(route, onDelete = { onDelete(route.id) }, isEnglish = isEnglish)
+                val (origin, destination) = route.name.split("→").map { it.trim() }
+                FavoriteRouteItem(
+                    route = route,
+                    onClick = { onClick(origin, destination) },
+                    onDelete = { onDelete(route.id) },
+                    isEnglish = isEnglish
+                )
             }
         }
     }
@@ -184,6 +193,7 @@ private fun FavoriteRoutesList(
 @Composable
 private fun FavoriteStationsList(
     favoriteStations: List<FavoriteStation>,
+    onClick: (Int) -> Unit,
     onDelete: (Int) -> Unit,
     isEnglish: Boolean
 ) {
@@ -200,7 +210,104 @@ private fun FavoriteStationsList(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(favoriteStations) { station ->
-                FavoriteStationItem(station, onDelete = { onDelete(station.id) }, isEnglish = isEnglish)
+                FavoriteStationItem(
+                    station = station,
+                    onClick = { onClick(station.id) },
+                    onDelete = { onDelete(station.id) },
+                    isEnglish = isEnglish
+                )
+            }
+        }
+    }
+}
+
+// ----------------------
+// COMPONENTES
+// ----------------------
+@Composable
+private fun FavoriteRouteItem(
+    route: FavoriteRoute,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    isEnglish: Boolean
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFFC107),
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(end = 16.dp)
+                )
+                Column {
+                    Text(route.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(route.line, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                }
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Close, contentDescription = "Eliminar")
+            }
+        }
+    }
+}
+
+@Composable
+private fun FavoriteStationItem(
+    station: FavoriteStation,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    isEnglish: Boolean
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Train,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(end = 16.dp)
+                )
+                Column {
+                    Text(station.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(station.line, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                    Text(station.district, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                }
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Close, contentDescription = "Eliminar")
             }
         }
     }
@@ -212,124 +319,12 @@ private fun EmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, me
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
-            )
-            Text(
-                message,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-            Text(
-                hint,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun FavoriteRouteItem(route: FavoriteRoute, onDelete: () -> Unit, isEnglish: Boolean) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xFFFFF9C4), RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Star, null, tint = Color(0xFFFFC107), modifier = Modifier.size(28.dp))
-                }
-
-                Column {
-                    Text(route.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(route.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
-                }
-            }
-
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Close, contentDescription = StringsManager.getString("delete", isEnglish))
-            }
-        }
-    }
-}
-
-@Composable
-private fun FavoriteStationItem(station: FavoriteStation, onDelete: () -> Unit, isEnglish: Boolean) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Train,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Column {
-                    Text(station.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(station.line, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        station.district,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                }
-            }
-
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Close, contentDescription = StringsManager.getString("delete", isEnglish))
-            }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(80.dp), tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+            Spacer(Modifier.height(8.dp))
+            Text(message, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
+            Spacer(Modifier.height(4.dp))
+            Text(hint, fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
         }
     }
 }

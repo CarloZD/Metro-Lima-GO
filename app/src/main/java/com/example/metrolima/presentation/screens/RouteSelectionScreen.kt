@@ -28,6 +28,7 @@ import com.example.metrolima.utils.StringsManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun RouteSelectionScreen(
     viewModel: EstacionViewModel = viewModel(),
     onBack: () -> Unit = {},
@@ -35,18 +36,31 @@ fun RouteSelectionScreen(
     onNavigateToStations: () -> Unit = {},
     onNavigateToRoutes: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    languageViewModel: LanguageViewModel = viewModel()
+    languageViewModel: LanguageViewModel = viewModel(),
+    preselectedOrigin: String = "",
+    preselectedDestination: String = ""
 ) {
     val estaciones by viewModel.estaciones.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isEnglish by languageViewModel.isEnglish.collectAsState()
 
+    // 🔹 Cargar estaciones al iniciar
     LaunchedEffect(Unit) { viewModel.loadEstacionesRemotas() }
 
     var origen by remember { mutableStateOf<Estacion?>(null) }
     var destino by remember { mutableStateOf<Estacion?>(null) }
     var tiempoEstimado by remember { mutableStateOf<String?>(null) }
     var estacionesIntermedias by remember { mutableStateOf(0) }
+
+    // 🔹 Cuando se cargan las estaciones, buscamos si hay origen/destino preseleccionados
+    LaunchedEffect(estaciones) {
+        if (preselectedOrigin.isNotBlank()) {
+            origen = estaciones.find { it.nombre.equals(preselectedOrigin, ignoreCase = true) }
+        }
+        if (preselectedDestination.isNotBlank()) {
+            destino = estaciones.find { it.nombre.equals(preselectedDestination, ignoreCase = true) }
+        }
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -134,6 +148,7 @@ fun RouteSelectionScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // 🔹 Mostrar origen y destino actual
                     InfoCard(
                         icon = Icons.Default.LocationOn,
                         title = StringsManager.getString("origin", isEnglish),
@@ -145,6 +160,7 @@ fun RouteSelectionScreen(
                         value = destino?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
 
+                    // 🔹 Dropdowns
                     EstacionDropdown(
                         label = StringsManager.getString("select_origin", isEnglish),
                         estaciones = estaciones
@@ -155,6 +171,7 @@ fun RouteSelectionScreen(
                         estaciones = estaciones
                     ) { destino = it }
 
+                    // 🔹 Botón Calcular ruta
                     Button(
                         onClick = {
                             if (origen != null && destino != null) {
@@ -175,6 +192,7 @@ fun RouteSelectionScreen(
                         Text(StringsManager.getString("calculate_route", isEnglish))
                     }
 
+                    // 🔹 Mostrar resultados si se calcularon
                     if (tiempoEstimado != null) {
                         InfoCard(
                             icon = Icons.Default.Schedule,
@@ -194,6 +212,7 @@ fun RouteSelectionScreen(
         }
     }
 }
+
 
 @Composable
 fun InfoCard(

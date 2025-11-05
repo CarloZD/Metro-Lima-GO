@@ -1,5 +1,6 @@
 package com.example.metrolima.presentation.navigation
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -25,13 +26,23 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
     object Favorites : Screen("favorites")
     object About : Screen("about")
-    object Lines : Screen("lines")  // ✅ AGREGADO
+    object Lines : Screen("lines")
+
     object RouteDetail : Screen("route_detail/{origin}/{destination}") {
         fun createRoute(origin: String, destination: String) = "route_detail/$origin/$destination"
     }
+
+    // ✅ Nueva ruta para preseleccionar origen y destino
+    object RouteSelectionWithParams : Screen("routes/{origin}/{destination}") {
+        fun createRoute(origin: String, destination: String): String {
+            return "routes/${Uri.encode(origin)}/${Uri.encode(destination)}"
+        }
+    }
+
     object StationDetail : Screen("station_detail/{stationId}") {
         fun createRoute(stationId: String) = "station_detail/$stationId"
     }
+
     object LineDetail : Screen("line_detail/{lineId}") {
         fun createRoute(lineId: Int) = "line_detail/$lineId"
     }
@@ -49,18 +60,18 @@ fun MetroNavigation() {
         navController = navController,
         startDestination = Screen.Home.route
     ) {
-        // Home
+        // 🏠 Pantalla de inicio
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToLines = { navController.navigate(Screen.Lines.route) },  // ✅ CONECTADO
+                onNavigateToLines = { navController.navigate(Screen.Lines.route) },
                 languageViewModel = languageViewModel
             )
         }
 
-        // ✅ NUEVA RUTA: Lista de Líneas
+        // 🚉 Lista de Líneas
         composable(Screen.Lines.route) {
             LinesScreen(
                 onNavigateToHome = {
@@ -79,7 +90,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Detalle de Línea
+        // 🧭 Detalle de línea
         composable(Screen.LineDetail.route) { backStackEntry ->
             val lineId = backStackEntry.arguments?.getString("lineId")?.toIntOrNull() ?: 1
             LineDetailScreen(
@@ -92,7 +103,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Lista de estaciones
+        // 🚉 Lista de estaciones
         composable(Screen.Stations.route) {
             StationsScreen(
                 onNavigateToHome = {
@@ -110,7 +121,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Detalle de estación
+        // 🏗️ Detalle de estación
         composable(Screen.StationDetail.route) { backStackEntry ->
             val stationId = backStackEntry.arguments?.getString("stationId")?.toIntOrNull() ?: 1
             StationDetailScreen(
@@ -126,10 +137,19 @@ fun MetroNavigation() {
             )
         }
 
-        // Favoritos
+        // ⭐ Favoritos
         composable(Screen.Favorites.route) {
             FavoritesScreen(
                 onBack = { navController.popBackStack() },
+                onNavigateToDetail = { stationId ->
+                    navController.navigate(Screen.StationDetail.createRoute(stationId.toString()))
+                },
+                onNavigateToRouteDetail = { origin, destination ->
+                    // ✅ Navegación hacia la nueva ruta con origen y destino preseleccionados
+                    navController.navigate(
+                        Screen.RouteSelectionWithParams.createRoute(origin, destination)
+                    )
+                },
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
@@ -138,7 +158,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Configuración
+        // ⚙️ Configuración
         composable(Screen.Settings.route) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
@@ -154,7 +174,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Acerca de
+        // ℹ️ Acerca de
         composable(Screen.About.route) {
             AboutScreen(
                 onBack = { navController.popBackStack() },
@@ -170,7 +190,7 @@ fun MetroNavigation() {
             )
         }
 
-        // Rutas - Pantalla de selección de rutas
+        // 🗺️ Pantalla de selección de rutas
         composable(Screen.Routes.route) {
             RouteSelectionScreen(
                 onBack = { navController.popBackStack() },
@@ -180,7 +200,24 @@ fun MetroNavigation() {
                     }
                 },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
-                onNavigateToRoutes = { /* Ya estamos en rutas */ },
+                onNavigateToRoutes = { /* Ya estamos aquí */ },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
+            )
+        }
+
+        // ✅ Nueva versión de selección de rutas con origen/destino
+        composable(Screen.RouteSelectionWithParams.route) { backStackEntry ->
+            val origin = backStackEntry.arguments?.getString("origin") ?: ""
+            val destination = backStackEntry.arguments?.getString("destination") ?: ""
+
+            RouteSelectionScreen(
+                preselectedOrigin = origin,
+                preselectedDestination = destination,
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { /* Ya estás en rutas */ },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 languageViewModel = languageViewModel
             )

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [Estacion::class, Linea::class],
-    version = 3, // ⚠️ Incrementa la versión
+    version = 4, // ⚠️ Incrementa la versión
     exportSchema = false
 )
 abstract class MetroDatabase : RoomDatabase() {
@@ -42,6 +42,8 @@ abstract class MetroDatabase : RoomDatabase() {
                 instance
             }
         }
+
+
 
         private class DatabaseCallback(
             private val context: Context
