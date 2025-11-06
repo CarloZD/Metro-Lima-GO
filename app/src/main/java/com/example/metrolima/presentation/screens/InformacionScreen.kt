@@ -83,7 +83,7 @@ fun InformacionScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
             // Tabs
@@ -133,7 +133,7 @@ private fun TarifasTab(tarifas: List<Tarifa>, isEnglish: Boolean) {
             Spacer(Modifier.height(8.dp))
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(Color.White),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
@@ -156,7 +156,7 @@ private fun TarifasTab(tarifas: List<Tarifa>, isEnglish: Boolean) {
 private fun TarifaCard(tarifa: Tarifa) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -169,7 +169,7 @@ private fun TarifaCard(tarifa: Tarifa) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(tarifa.tipo, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text(tarifa.descripcion, fontSize = 13.sp, color = Color.Gray)
+                Text(tarifa.descripcion, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text(
                 "S/ ${String.format("%.2f", tarifa.precioSoles)}",
@@ -198,9 +198,9 @@ private fun AvisosTab(avisos: List<AvisoMantenimiento>, isEnglish: Boolean) {
     if (avisos.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.CheckCircle, null, Modifier.size(64.dp), tint = Color.Gray)
+                Icon(Icons.Default.CheckCircle, null, Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(16.dp))
-                Text(StringsManager.getString("no_alerts", isEnglish), color = Color.Gray)
+                Text(StringsManager.getString("no_alerts", isEnglish), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     } else {
@@ -220,7 +220,7 @@ private fun AvisosTab(avisos: List<AvisoMantenimiento>, isEnglish: Boolean) {
 private fun AvisoCard(aviso: AvisoMantenimiento, isEnglish: Boolean) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
@@ -239,13 +239,13 @@ private fun AvisoCard(aviso: AvisoMantenimiento, isEnglish: Boolean) {
                 Text(aviso.titulo, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             Spacer(Modifier.height(8.dp))
-            Text(aviso.descripcion, fontSize = 14.sp, color = Color.Gray)
+            Text(aviso.descripcion, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(aviso.fecha, fontSize = 12.sp, color = Color.Gray)
+                Text(aviso.fecha, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
                     "${StringsManager.getString("affected_lines", isEnglish)}: ${aviso.lineasAfectadas.joinToString()}",
                     fontSize = 12.sp,
@@ -273,7 +273,7 @@ private fun ConsejosTab(consejos: List<ConsejoSeguridad>, isEnglish: Boolean) {
 private fun ConsejoCard(consejo: ConsejoSeguridad) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -290,7 +290,7 @@ private fun ConsejoCard(consejo: ConsejoSeguridad) {
             Column {
                 Text(consejo.titulo, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                 Spacer(Modifier.height(4.dp))
-                Text(consejo.descripcion, fontSize = 14.sp, color = Color.Gray)
+                Text(consejo.descripcion, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

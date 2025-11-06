@@ -92,7 +92,7 @@ fun LinesScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(padding),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -119,7 +119,7 @@ private fun LineCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -153,13 +153,13 @@ private fun LineCard(
                     linea.nombre,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     linea.descripcion,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -181,7 +181,7 @@ private fun LineCard(
             Icon(
                 Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
