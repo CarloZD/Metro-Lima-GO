@@ -34,6 +34,7 @@ fun HomeScreen(
     onNavigateToRoutes: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToLines: ()-> Unit = {},
+    onNavigateToInformacion: () -> Unit = {},
     languageViewModel: LanguageViewModel = viewModel()
 ) {
     val isEnglish by languageViewModel.isEnglish.collectAsState()
@@ -131,7 +132,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Espaciado más pequeño
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     QuickAccessCard(
                         icon = Icons.Default.Schedule,
@@ -152,6 +153,13 @@ fun HomeScreen(
                         iconColor = Color(0xFF4CAF50),
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToRoutes() }
+                    )
+                    QuickAccessCard(
+                        icon = Icons.Default.Info,  // 🔹 NUEVO
+                        title = if (isEnglish) "Info" else "Info",
+                        iconColor = Color(0xFF2196F3),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToInformacion() }  // 🔹 NUEVO
                     )
                 }
             }

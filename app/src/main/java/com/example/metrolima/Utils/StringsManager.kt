@@ -356,6 +356,58 @@ object StringsManager {
         "view_stations" to mapOf(
             "es" to "Ver estaciones",
             "en" to "View stations"
+        ),
+        "additional_info" to mapOf(
+            "es" to "Información Adicional",
+            "en" to "Additional Information"
+        ),
+        "fares" to mapOf(
+            "es" to "Tarifas",
+            "en" to "Fares"
+        ),
+        "payment_methods" to mapOf(
+            "es" to "Métodos de Pago",
+            "en" to "Payment Methods"
+        ),
+        "maintenance_alerts" to mapOf(
+            "es" to "Avisos de Mantenimiento",
+            "en" to "Maintenance Alerts"
+        ),
+        "safety_tips" to mapOf(
+            "es" to "Consejos de Seguridad",
+            "en" to "Safety Tips"
+        ),
+        "general_fare" to mapOf(
+            "es" to "Tarifa General",
+            "en" to "General Fare"
+        ),
+        "student_fare" to mapOf(
+            "es" to "Tarifa Universitaria",
+            "en" to "Student Fare"
+        ),
+        "school_fare" to mapOf(
+            "es" to "Tarifa Escolar",
+            "en" to "School Fare"
+        ),
+        "senior_fare" to mapOf(
+            "es" to "Tarifa Adulto Mayor",
+            "en" to "Senior Fare"
+        ),
+        "cash" to mapOf(
+            "es" to "Efectivo",
+            "en" to "Cash"
+        ),
+        "card" to mapOf(
+            "es" to "Tarjeta",
+            "en" to "Card"
+        ),
+        "no_alerts" to mapOf(
+            "es" to "No hay avisos actualmente",
+            "en" to "No alerts currently"
+        ),
+        "affected_lines" to mapOf(
+            "es" to "Líneas afectadas",
+            "en" to "Affected lines"
         )
     )
 

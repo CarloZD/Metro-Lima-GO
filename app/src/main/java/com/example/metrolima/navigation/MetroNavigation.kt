@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.metrolima.presentation.screens.*
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
+import com.example.metrolima.presentation.screens.InformacionScreen
 
 /* ---------------------------
    Definición de rutas
@@ -27,6 +28,7 @@ sealed class Screen(val route: String) {
     object Favorites : Screen("favorites")
     object About : Screen("about")
     object Lines : Screen("lines")
+    object Informacion : Screen("informacion")
 
     object RouteDetail : Screen("route_detail/{origin}/{destination}") {
         fun createRoute(origin: String, destination: String) = "route_detail/$origin/$destination"
@@ -67,6 +69,7 @@ fun MetroNavigation() {
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToLines = { navController.navigate(Screen.Lines.route) },
+                onNavigateToInformacion = { navController.navigate(Screen.Informacion.route) },
                 languageViewModel = languageViewModel
             )
         }
@@ -136,6 +139,26 @@ fun MetroNavigation() {
                 languageViewModel = languageViewModel
             )
         }
+        // 🗺️ Detalle de ruta
+        composable(Screen.RouteDetail.route) { backStackEntry ->
+            val origin = backStackEntry.arguments?.getString("origin") ?: ""
+            val destination = backStackEntry.arguments?.getString("destination") ?: ""
+
+            RouteDetailScreenWithButtons(
+                origin = origin,
+                destination = destination,
+                onBack = { navController.popBackStack() },
+                onSaveRoute = {
+                    // Lógica para guardar la ruta en favoritos
+                    navController.navigate(Screen.Favorites.route)
+                },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
+            )
+        }
 
         // ⭐ Favoritos
         composable(Screen.Favorites.route) {
@@ -170,6 +193,7 @@ fun MetroNavigation() {
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToAbout = { navController.navigate(Screen.About.route) },
+                onNavigateToInformacion = { navController.navigate(Screen.Informacion.route) },
                 languageViewModel = languageViewModel
             )
         }
@@ -218,6 +242,21 @@ fun MetroNavigation() {
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToStations = { navController.navigate(Screen.Stations.route) },
                 onNavigateToRoutes = { /* Ya estás en rutas */ },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                languageViewModel = languageViewModel
+            )
+        }
+        // ℹ️ Pantalla de Información Adicional
+        composable(Screen.Informacion.route) {
+            InformacionScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToStations = { navController.navigate(Screen.Stations.route) },
+                onNavigateToRoutes = { navController.navigate(Screen.Routes.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 languageViewModel = languageViewModel
             )

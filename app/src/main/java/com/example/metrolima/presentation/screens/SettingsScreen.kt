@@ -28,6 +28,7 @@ fun SettingsScreen(
     onNavigateToStations: () -> Unit,
     onNavigateToRoutes: () -> Unit,
     onNavigateToAbout: () -> Unit = {},
+    onNavigateToInformacion: () -> Unit = {},
     themeViewModel: ThemeViewModel = viewModel(),
     languageViewModel: LanguageViewModel = viewModel()
 ) {
@@ -161,6 +162,15 @@ fun SettingsScreen(
                 title = StringsManager.getString("about", isEnglish),
                 onClick = onNavigateToAbout
             )
+
+            // ℹ️ Información Adicional  🔹 NUEVO BLOQUE
+            SettingItem(
+                icon = Icons.Default.Newspaper,
+                title = StringsManager.getString("additional_info", isEnglish),
+                onClick = onNavigateToInformacion
+            )
+
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
             Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
