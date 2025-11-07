@@ -1,6 +1,5 @@
 package com.example.metrolima.presentation.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,12 +25,12 @@ import com.example.metrolima.presentation.viewmodel.EstacionViewModel
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.utils.StringsManager
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.*
 import com.google.android.gms.maps.model.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun RouteSelectionScreen(
     viewModel: EstacionViewModel = viewModel(),
     onBack: () -> Unit = {},
@@ -47,15 +46,23 @@ fun RouteSelectionScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val isEnglish by languageViewModel.isEnglish.collectAsState()
 
-    // 🔹 Cargar estaciones al iniciar
-    LaunchedEffect(Unit) { viewModel.loadEstacionesRemotas() }
-
     var origen by remember { mutableStateOf<Estacion?>(null) }
     var destino by remember { mutableStateOf<Estacion?>(null) }
     var tiempoEstimado by remember { mutableStateOf<String?>(null) }
     var estacionesIntermedias by remember { mutableStateOf(0) }
+    var rutaCalculada by remember { mutableStateOf(false) }
 
-    // 🔹 Cuando se cargan las estaciones, buscamos si hay origen/destino preseleccionados
+    val defaultLatLng = LatLng(-12.0464, -77.0428) // Centro de Lima
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(defaultLatLng, 11.5f)
+    }
+
+    // Cargar estaciones
+    LaunchedEffect(Unit) {
+        viewModel.loadEstacionesRemotas()
+    }
+
+    // Preselección
     LaunchedEffect(estaciones) {
         if (preselectedOrigin.isNotBlank()) {
             origen = estaciones.find { it.nombre.equals(preselectedOrigin, ignoreCase = true) }
@@ -71,9 +78,7 @@ fun RouteSelectionScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = StringsManager.getString("route", isEnglish)
-                            .lowercase()
-                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
+                        StringsManager.getString("route", isEnglish).replaceFirstChar { it.uppercase() },
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -89,9 +94,7 @@ fun RouteSelectionScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
@@ -122,53 +125,39 @@ fun RouteSelectionScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .imePadding(),
-                verticalArrangement = Arrangement.Top
+                    .imePadding()
             ) {
-                // 🔹 Mostrar SIEMPRE el mapa con o sin origen/destino
+                // 📍 MAPA
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp) // Borde parejo
+                        .padding(16.dp)
                         .height(250.dp),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(6.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    val defaultLatLng = LatLng(-12.0464, -77.0428) // Lima centro
-                    val cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(
-                            origen?.let { LatLng(it.latitud, it.longitud) } ?: defaultLatLng,
-                            12f
-                        )
-                    }
-
                     GoogleMap(
                         modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState
                     ) {
-                        origen?.let {
+                        if (rutaCalculada && origen != null && destino != null) {
+                            val originLatLng = LatLng(origen!!.latitud, origen!!.longitud)
+                            val destinationLatLng = LatLng(destino!!.latitud, destino!!.longitud)
+
                             Marker(
-                                state = MarkerState(position = LatLng(it.latitud, it.longitud)),
+                                state = MarkerState(position = originLatLng),
                                 title = "Origen",
-                                snippet = it.nombre
+                                snippet = origen!!.nombre
                             )
-                        }
-
-                        destino?.let {
                             Marker(
-                                state = MarkerState(position = LatLng(it.latitud, it.longitud)),
+                                state = MarkerState(position = destinationLatLng),
                                 title = "Destino",
-                                snippet = it.nombre
+                                snippet = destino!!.nombre
                             )
-                        }
 
-                        if (origen != null && destino != null) {
                             Polyline(
-                                points = listOf(
-                                    LatLng(origen!!.latitud, origen!!.longitud),
-                                    LatLng(destino!!.latitud, destino!!.longitud)
-                                ),
+                                points = listOf(originLatLng, destinationLatLng),
                                 color = Color.Blue,
                                 width = 5f
                             )
@@ -176,12 +165,10 @@ fun RouteSelectionScreen(
                     }
                 }
 
-
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = StringsManager.getString("trip_details", isEnglish),
+                    StringsManager.getString("trip_details", isEnglish),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -194,7 +181,6 @@ fun RouteSelectionScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // 🔹 Mostrar origen y destino actual
                     InfoCard(
                         icon = Icons.Default.LocationOn,
                         title = StringsManager.getString("origin", isEnglish),
@@ -206,7 +192,6 @@ fun RouteSelectionScreen(
                         value = destino?.nombre ?: StringsManager.getString("select_station", isEnglish)
                     )
 
-                    // 🔹 Dropdowns
                     EstacionDropdown(
                         label = StringsManager.getString("select_origin", isEnglish),
                         estaciones = estaciones
@@ -217,7 +202,6 @@ fun RouteSelectionScreen(
                         estaciones = estaciones
                     ) { destino = it }
 
-                    // 🔹 Botón Calcular ruta
                     Button(
                         onClick = {
                             if (origen != null && destino != null) {
@@ -225,6 +209,16 @@ fun RouteSelectionScreen(
                                 val intermedias = (5..20).random()
                                 tiempoEstimado = "$tiempo min"
                                 estacionesIntermedias = intermedias
+                                rutaCalculada = true
+
+                                // Zoom a la ruta
+                                val bounds = LatLngBounds.builder()
+                                    .include(LatLng(origen!!.latitud, origen!!.longitud))
+                                    .include(LatLng(destino!!.latitud, destino!!.longitud))
+                                    .build()
+                                cameraPositionState.move(
+                                    CameraUpdateFactory.newLatLngBounds(bounds, 100)
+                                )
                             }
                         },
                         enabled = origen != null && destino != null,
@@ -238,7 +232,6 @@ fun RouteSelectionScreen(
                         Text(StringsManager.getString("calculate_route", isEnglish))
                     }
 
-                    // 🔹 Mostrar resultados si se calcularon
                     if (tiempoEstimado != null) {
                         InfoCard(
                             icon = Icons.Default.Schedule,
@@ -258,7 +251,6 @@ fun RouteSelectionScreen(
         }
     }
 }
-
 
 @Composable
 fun InfoCard(
