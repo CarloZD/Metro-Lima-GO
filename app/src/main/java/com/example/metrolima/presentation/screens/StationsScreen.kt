@@ -90,7 +90,7 @@ fun StationsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
             // 🔍 Barra de búsqueda
@@ -117,10 +117,10 @@ fun StationsScreen(
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedBorderColor = MaterialTheme.colorScheme.outline,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
                 )
             )
 
@@ -170,7 +170,7 @@ fun StationsScreen(
             Text(
                 "${estaciones.size} ${StringsManager.getString("stations_found", isEnglish)}",
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
@@ -189,13 +189,13 @@ fun StationsScreen(
                                 imageVector = Icons.Default.SearchOff,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = Color.Gray
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 StringsManager.getString("no_stations_found", isEnglish),
                                 fontSize = 16.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             if (selectedLine != "Todas" || searchQuery.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -248,8 +248,8 @@ private fun LineFilterChip(
             .height(32.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        color = if (isSelected) Color(0xFF2196F3) else Color.White,
-        border = if (!isSelected) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0E0E0)) else null
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        border = if (!isSelected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null
     ) {
         Box(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -259,7 +259,7 @@ private fun LineFilterChip(
                 text = label,
                 fontSize = 13.sp,
                 fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
-                color = if (isSelected) Color.White else Color.Black
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -279,7 +279,7 @@ private fun ModernStationCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -304,13 +304,13 @@ private fun ModernStationCard(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFE3F2FD)),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Train,
                         contentDescription = null,
-                        tint = Color(0xFF2196F3),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -324,7 +324,7 @@ private fun ModernStationCard(
                     name,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 15.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -348,7 +348,7 @@ private fun ModernStationCard(
 
                     Text(
                         district,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp
                     )
                 }

@@ -134,7 +134,7 @@ fun LineDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFF5F5F5))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(padding)
             ) {
                 // Información de la línea
@@ -168,7 +168,7 @@ private fun LineInfoCard(linea: Linea, isEnglish: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(
@@ -236,11 +236,11 @@ private fun LineInfoCard(linea: Linea, isEnglish: Boolean) {
 private fun InfoItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, Modifier.size(16.dp), tint = Color.Gray)
+            Icon(icon, null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(4.dp))
-            Text(label, fontSize = 12.sp, color = Color.Gray)
+            Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Text(value, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+        Text(value, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -261,7 +261,7 @@ private fun StationsList(
                 "${estaciones.size} ${if (isEnglish) "stations" else "estaciones"}",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }
@@ -317,19 +317,20 @@ private fun StationListItem(
 
         Card(
             modifier = Modifier.weight(1f),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(1.dp)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     estacion.nombre,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     estacion.distrito,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
