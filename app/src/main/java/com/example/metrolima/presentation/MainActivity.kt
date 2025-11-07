@@ -40,24 +40,14 @@ class MainActivity : ComponentActivity() {
                 updateLocale(this@MainActivity, locale)
             }
 
-            // Verificar WiFi periódicamente
-            LaunchedEffect(Unit) {
-                while (true) {
-                    isWifiConnected = isWifiConnected()
-                    kotlinx.coroutines.delay(2000) // Verificar cada 2 segundos
-                }
-            }
 
             MetroLimaTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (isWifiConnected) {
-                        MetroNavigation()
-                    } else {
-                        NoWifiScreen(isEnglish = isEnglish)
-                    }
+                    MetroNavigation()
+
                 }
             }
         }
