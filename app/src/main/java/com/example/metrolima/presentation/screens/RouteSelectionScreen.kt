@@ -141,21 +141,30 @@ fun RouteSelectionScreen(
                         modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState
                     ) {
+                        // 🔹 Mostrar todas las estaciones con marcador rojo
+                        estaciones.forEach { estacion ->
+                            Marker(
+                                state = MarkerState(position = LatLng(estacion.latitud, estacion.longitud)),
+                                title = estacion.nombre,
+                                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                            )
+                        }
+
+                        // 🔹 Si hay ruta calculada, marcar origen/destino con diferentes colores y dibujar línea
                         if (rutaCalculada && origen != null && destino != null) {
                             val originLatLng = LatLng(origen!!.latitud, origen!!.longitud)
                             val destinationLatLng = LatLng(destino!!.latitud, destino!!.longitud)
 
                             Marker(
                                 state = MarkerState(position = originLatLng),
-                                title = "Origen",
-                                snippet = origen!!.nombre
+                                title = "Origen: ${origen!!.nombre}",
+                                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
                             )
                             Marker(
                                 state = MarkerState(position = destinationLatLng),
-                                title = "Destino",
-                                snippet = destino!!.nombre
+                                title = "Destino: ${destino!!.nombre}",
+                                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
                             )
-
                             Polyline(
                                 points = listOf(originLatLng, destinationLatLng),
                                 color = Color.Blue,
@@ -163,6 +172,7 @@ fun RouteSelectionScreen(
                             )
                         }
                     }
+
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
