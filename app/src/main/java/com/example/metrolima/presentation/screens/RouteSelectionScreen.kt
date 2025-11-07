@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,8 @@ import com.example.metrolima.presentation.viewmodel.EstacionViewModel
 import com.example.metrolima.presentation.viewmodel.LanguageViewModel
 import com.example.metrolima.presentation.components.BottomNavigationBar
 import com.example.metrolima.utils.StringsManager
+import com.google.maps.android.compose.*
+import com.google.android.gms.maps.model.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,15 +125,58 @@ fun RouteSelectionScreen(
                     .imePadding(),
                 verticalArrangement = Arrangement.Top
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.mapa_lima),
-                    contentDescription = "Mapa de la ruta",
+                // 🔹 Mostrar SIEMPRE el mapa con o sin origen/destino
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                        .padding(16.dp) // Borde parejo
+                        .height(250.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    val defaultLatLng = LatLng(-12.0464, -77.0428) // Lima centro
+                    val cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(
+                            origen?.let { LatLng(it.latitud, it.longitud) } ?: defaultLatLng,
+                            12f
+                        )
+                    }
+
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        origen?.let {
+                            Marker(
+                                state = MarkerState(position = LatLng(it.latitud, it.longitud)),
+                                title = "Origen",
+                                snippet = it.nombre
+                            )
+                        }
+
+                        destino?.let {
+                            Marker(
+                                state = MarkerState(position = LatLng(it.latitud, it.longitud)),
+                                title = "Destino",
+                                snippet = it.nombre
+                            )
+                        }
+
+                        if (origen != null && destino != null) {
+                            Polyline(
+                                points = listOf(
+                                    LatLng(origen!!.latitud, origen!!.longitud),
+                                    LatLng(destino!!.latitud, destino!!.longitud)
+                                ),
+                                color = Color.Blue,
+                                width = 5f
+                            )
+                        }
+                    }
+                }
+
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 

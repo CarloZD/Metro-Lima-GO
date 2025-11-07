@@ -12,7 +12,7 @@ data class Estacion(
     val distrito: String,
     val horarioApertura: String = "05:00 AM",
     val horarioCierre: String = "10:00 PM",
-    val latitud: Double = -12.046374,
-    val longitud: Double = -77.042793,
+    val latitud: Double,
+    val longitud: Double,
     val imagenRes: Int = 0
 )
